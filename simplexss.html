@@ -41,9 +41,9 @@
     <!-- Hyperlink to another page -->
     <a href="javascript:alert(window.navigator.userAgent)" target="_blank">Test1</document></a>
     <br></br>
-    <a href="data:test;%3Cimg%20src=x%20onerror=alert(1)%3E" target="_blank">DATA URI XSS 1</a>
+    <a href="data:test;%3Cimg%20src=x%20onerror=alert(document.domain)%3E" target="_blank">DATA URI XSS 1</a>
     <br></br>
-    <a href="data:test;<img src=x onerror=alert(1)>" target="_blank">DATA URI XSS 2</a>
+    <a href="data:test;<img src=x onerror=alert(window.navigator.userAgent)>" target="_blank">DATA URI XSS 2</a>
 
     
     <br><br>
