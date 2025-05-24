@@ -1,18 +1,50 @@
-
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-  <title>Redirecting to Another page in HTML</title>
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" content="5;url=blob:https://apple.com">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirecting...</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+    }
+    .container {
+      background: #fff;
+      padding: 40px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      border-radius: 10px;
+    }
+    .countdown {
+      font-size: 24px;
+      color: #333;
+      margin-top: 20px;
+    }
+  </style>
 </head>
-
 <body>
-  <h3>
-    Redirecting to Another page in HTML
-  </h3>
-  <p>Click the below link to be redirected:
-    <a href="blob:https://apple.com" target="_blank">click here</a>
-  </p>
-</body>
+  <div class="container">
+    <h1>You are being redirected... to Apple website</h1>
+    <p class="countdown">Redirecting in <span id="seconds">5</span> seconds.</p>
+    <p>If you are not redirected, <a href="blob:https://apple.com">click here</a>.</p>
+  </div>
 
+  <script>
+    let seconds = 5;
+    const countdown = document.getElementById('seconds');
+    const interval = setInterval(() => {
+      seconds--;
+      countdown.textContent = seconds;
+      if (seconds <= 0) {
+        clearInterval(interval);
+      }
+    }, 1000);
+  </script>
+</body>
 </html>
