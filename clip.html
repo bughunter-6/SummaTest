@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Web3 Wallet In-App Browser Test Suite</title>
+  <style>
+    body { font-family: Arial; margin:20px; }
+    section { border:1px solid #aaa; padding:15px; margin-bottom:20px; }
+    pre { background:#f4f4f4; padding:10px; overflow:auto; }
+    button { margin-top:5px; }
+  </style>
+</head>
+<body>
+
+  <h1>Web3 Wallet In‑App Browser Test Suite</h1>
+
+  <!-- 1. Wallet Fingerprinting -->
+  <section>
+    <h2>🔍 Wallet Detection & Fingerprinting</h2>
+    <button onclick="detectWallet()">Check window.ethereum</button>
+    <pre id="fingerprint"></pre>
+  </section>
+
+  <!-- 2. Clipboard Text + Image -->
+  <section>
+    <h2>📋 Clipboard Test (Auto + Manual)</h2>
+    <button onclick="readClipboard()">Manual Read</button>
+    <pre id="cliptext">Awaiting clipboard...</pre>
+    <div id="clipimg"></div>
+  </section>
+
+  <!-- 3. Simulated Transaction Injection -->
+  <section>
+    <h2>🔄 Simulate RPC Transaction Calls</h2>
+    <button onclick="simulateSendTx()">Simulate eth_sendTransaction</button>
+    <pre id="rpclog"></pre>
+  </section>
+
+  <!-- 4. Extension Messenger/Content Script -->
+  <section>
+    <h2>🧩 postMessage / chrome.runtime Tests</h2>
+    <button onclick="testPost()">postMessage test</button>
+    <pre id="msglog"></pre>
+  </section>
+
+  <!-- 5. Storage Inspection -->
+  <section>
+    <h2>💾 Storage Inspection</h2>
+    <button onclick="inspectStorage()">Inspect storage</button>
+    <pre id="storagelog"></pre>
+  </section>
+
+  <!-- 6. URI Phishing Test -->
+  <section>
+    <h2>🎣 URI Phishing Test</h2>
+    <button onclick="triggerDeepLink()">Trigger wallet URI</button>
+    <pre id="phishlog"></pre>
+  </section>
+
+<script>
+// 1. Wallet detection
+function detectWallet(){
+  const out = document.getElementById('fingerprint');
+  if(window.ethereum){
+    let info = 'window.ethereum detected:\n';
+    for(let k in window.ethereum) info += `${k} = ${window.ethereum[k]}\n`;
+    out.textContent = info;
+  } else {
+    out.textContent = '✖ window.ethereum not present';
+  }
+}
+
+// 2. Clipboard
+async function readClipboard(){
+  const txtEl = document.getElementById('cliptext');
+  const imgEl = document.getElementById('clipimg');
+  txtEl.textContent = 'Reading...';
+  imgEl.innerHTML = '';
+  try{
+    if(navigator.clipboard.read){
+      const items = await navigator.clipboard.read();
+      for(let item of items){
+        if(item.types.includes('text/plain')){
+          const blob = await item.getType('text/plain');
+          const text = await blob.text();
+          txtEl.textContent = text;
+          break;
+        }
+        if(item.types.includes('image/png')){
+          const blob = await item.getType('image/png');
+          const url = URL.createObjectURL(blob);
+          const img = document.createElement('img');
+          img.src = url; img.style.maxWidth='100%';
+          imgEl.appendChild(img);
+          txtEl.textContent = '[Image found]';
+          break;
+        }
+      }
+    } else if(navigator.clipboard.readText){
+      const text = await navigator.clipboard.readText();
+      txtEl.textContent = text;
+    } else {
+      txtEl.textContent = 'Clipboard API not supported';
+    }
+  } catch(e){
+    txtEl.textContent = 'Error: '+e;
+  }
+}
+
+// 3. RPC test
+async function simulateSendTx(){
+  const out = document.getElementById('rpclog');
+  out.textContent = 'Sending simulated tx to window.ethereum…';
+  if(window.ethereum){
+    try{
+      await window.ethereum.request({
+        method: 'eth_sendTransaction',
+        params: [{ to: '0x000000000000000000000000000000000000dead', value: '0x0' }]
+      });
+      out.textContent += '\n✅ eth_sendTransaction succeeded (wallet allowed silently)';
+    } catch(err){
+      out.textContent += '\n❌ blocked/error: '+err.message;
+    }
+  } else {
+    out.textContent = '✖ no wallet present';
+  }
+}
+
+// 4. postMessage + chrome.runtime (Extension sniff)
+function testPost(){
+  const out = document.getElementById('msglog');
+  out.textContent = '';
+  window.addEventListener('message', e=>{
+    out.textContent += `Msg recv: ${JSON.stringify(e.data)}\n`;
+  });
+  window.postMessage({test:'Hello from page'}, '*');
+  if(window.chrome && chrome.runtime){
+    try{
+      chrome.runtime.sendMessage('abcdef', {ping:1}, resp=>{
+        out.textContent += 'chrome.runtime.sendMessage allowed\n';
+      });
+    } catch(e){
+      out.textContent += 'chrome.runtime restricted: '+e+'\n';
+    }
+  } else {
+    out.textContent += 'No chrome.runtime';
+  }
+}
+
+// 5. Storage inspect
+function inspectStorage(){
+  const out = document.getElementById('storagelog');
+  out.textContent = '';
+  for(let k in localStorage) out.textContent += `localStorage[${k}]='${localStorage[k]}'\n`;
+  for(let k in sessionStorage) out.textContent += `sessionStorage[${k}]='${sessionStorage[k]}'\n`;
+  var req = indexedDB.open('idb-test');
+  req.onerror = ()=> out.textContent += 'IDB open error\n';
+  req.onsuccess = ()=> out.textContent += 'IndexedDB accessible\n';
+}
+
+// 6. Phishing URI
+function triggerDeepLink(){
+  const out = document.getElementById('phishlog');
+  const uri = 'https://walletconnect.org/?sessionId=phish-test';
+  out.textContent = 'Triggering deep link: '+uri;
+  window.location.href = uri;
+}
+</script>
+</body>
+</html>
