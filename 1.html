@@ -1,29 +1,465 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" >
 <head>
-  <title>Iframe Download Origin Confusion PoC</title>
+  <meta charset="UTF-8" />
+  <title>Advanced Web3 Wallet Browser Security Test Suite</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; }
+    section { background: #fff; border: 1px solid #ccc; margin-bottom: 20px; padding: 15px; border-radius: 6px; }
+    button { margin-top: 5px; margin-bottom: 10px; }
+    pre { background: #eee; padding: 10px; max-height: 180px; overflow: auto; white-space: pre-wrap; word-break: break-word; }
+    h2 { margin-top: 0; }
+    img { max-width: 100%; max-height: 150px; border: 1px solid #ccc; margin-top: 5px; }
+    small { color: #666; }
+  </style>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';">
 </head>
 <body>
-  <h1>Testing Iframe Download Origin Confusion</h1>
+  <h1>🛡️ Advanced Web3 Wallet Browser Security Test Suite</h1>
 
-  <!-- Embed a trusted origin (e.g., example.com or your own site) -->
-  <iframe id="trustedFrame" src="https://example.com" width="0" height="0" sandbox="allow-scripts allow-downloads" style="display: none;"></iframe>
+  <!-- 1. Wallet Detection & Fingerprinting -->
+  <section>
+    <h2>🔍 Wallet Detection & Fingerprinting</h2>
+    <button onclick="detectWallet()">Detect window.ethereum & Providers</button>
+    <pre id="fingerprint"></pre>
+  </section>
 
-  <script>
-    // Wait for iframe to load
-    window.onload = function () {
-      // Replace this with a malicious file or endpoint you control for the demo
-      const maliciousFile = 'https://bughunter-6.github.io/SummaTest/test.apk';
+  <!-- 2. Clipboard Text + Image + Overwrite Test -->
+  <section>
+    <h2>📋 Clipboard Read + Overwrite Protection</h2>
+    <button onclick="readClipboard()">Manual Clipboard Read</button>
+    <button onclick="testClipboardOverwrite()">Test Clipboard Overwrite Protection</button>
+    <pre id="cliptext">Waiting for clipboard action...</pre>
+    <div id="clipimg"></div>
+  </section>
 
-      // Create a hidden iframe
-      const iframe = document.getElementById('trustedFrame');
+  <!-- 3. Simulate RPC Transaction / Replay -->
+  <section>
+    <h2>🔄 Simulated eth_sendTransaction & Replay</h2>
+    <button onclick="simulateSendTx()">Simulate eth_sendTransaction</button>
+    <button onclick="simulateReplayTx()">Simulate Replay (Nonce Reuse)</button>
+    <pre id="rpclog"></pre>
+  </section>
 
-      // Inject script into iframe (depends on CORS/sandbox restrictions)
-      // Alternatively: redirect iframe to download file
-      setTimeout(() => {
-        iframe.src = maliciousFile;
-      }, 1000); // delay to ensure iframe is loaded
+  <!-- 4. postMessage & Extension Messaging -->
+  <section>
+    <h2>🧩 postMessage & chrome.runtime Messaging</h2>
+    <button onclick="testPost()">Test postMessage + chrome.runtime</button>
+    <pre id="msglog"></pre>
+  </section>
+
+  <!-- 5. Storage Inspection -->
+  <section>
+    <h2>💾 Storage Inspection (localStorage, sessionStorage, IndexedDB)</h2>
+    <button onclick="inspectStorage()">Inspect Storage</button>
+    <pre id="storagelog"></pre>
+  </section>
+
+  <!-- 6. Deep Link / URI Phishing Test -->
+  <section>
+    <h2>🎣 URI Phishing / Deep Link Trigger</h2>
+    <button onclick="triggerDeepLink()">Trigger wallet URI</button>
+    <pre id="phishlog"></pre>
+  </section>
+
+  <!-- 7. MutationObserver DOM Injection -->
+  <section>
+    <h2>🕵️ MutationObserver for DOM Injection Detection</h2>
+    <button onclick="startMutationObserver()">Start Observer</button>
+    <pre id="mutationlog">Not started</pre>
+  </section>
+
+  <!-- 8. EIP-712 Typed Data Signing -->
+  <section>
+    <h2>✍️ Simulate EIP-712 Typed Data Signature</h2>
+    <button onclick="simulateEIP712()">Sign Typed Data</button>
+    <pre id="eip712log"></pre>
+  </section>
+
+  <!-- 9. Multiple Provider Race Condition -->
+  <section>
+    <h2>⚔️ Multiple Wallet Provider Detection</h2>
+    <button onclick="detectMultipleProviders()">Detect Multiple ethereum providers</button>
+    <pre id="multiprovlog"></pre>
+  </section>
+
+  <!-- 10. Media Permissions (Camera/Mic) -->
+  <section>
+    <h2>🎥 Media Permissions Check</h2>
+    <button onclick="checkMediaPermissions()">Check Camera/Microphone Permissions</button>
+    <pre id="mediapermslog"></pre>
+  </section>
+
+  <!-- 11. CSP Enforcement & XSS Injection -->
+  <section>
+    <h2>🚨 CSP Enforcement & XSS Injection Test</h2>
+    <button onclick="testCSPAndXSS()">Run CSP & XSS Injection Test</button>
+    <pre id="csplog"></pre>
+    <div id="xssoutput" style="color: red; font-weight: bold;"></div>
+  </section>
+
+  <!-- 12. WebSocket Insecure Connection Test -->
+  <section>
+    <h2>📡 WebSocket Insecure Connection Test</h2>
+    <button onclick="testWebSocket()">Test WebSocket Connection</button>
+    <pre id="wslog"></pre>
+  </section>
+
+  <!-- 13. Canvas Fingerprinting -->
+  <section>
+    <h2>🎨 Advanced Canvas Fingerprinting</h2>
+    <button onclick="testCanvasFingerprint()">Test Canvas Fingerprinting</button>
+    <pre id="canvaslog"></pre>
+  </section>
+
+<script>
+  // 1. Wallet detection & fingerprinting
+  function detectWallet() {
+    const out = document.getElementById('fingerprint');
+    let info = '';
+    if (window.ethereum) {
+      info += 'window.ethereum detected:\n';
+      for (let key in window.ethereum) {
+        let val;
+        try {
+          val = window.ethereum[key];
+        } catch (e) {
+          val = '[Error reading]';
+        }
+        info += `  ${key} : ${val}\n`;
+      }
+    } else {
+      info += '✖ window.ethereum not found\n';
+    }
+    // Detect multiple providers if any
+    if (window.ethereum && window.ethereum.providers && Array.isArray(window.ethereum.providers)) {
+      info += '\nMultiple ethereum providers detected:\n';
+      window.ethereum.providers.forEach((prov, i) => {
+        info += ` Provider ${i + 1}: ${prov.isMetaMask ? 'MetaMask' : 'Unknown'}\n`;
+      });
+    }
+    out.textContent = info;
+  }
+
+  // 2. Clipboard read & overwrite protection
+  async function readClipboard() {
+    const txtEl = document.getElementById('cliptext');
+    const imgEl = document.getElementById('clipimg');
+    txtEl.textContent = 'Reading clipboard...';
+    imgEl.innerHTML = '';
+    try {
+      if (navigator.clipboard.read) {
+        const items = await navigator.clipboard.read();
+        for (const item of items) {
+          if (item.types.includes('text/plain')) {
+            const blob = await item.getType('text/plain');
+            const text = await blob.text();
+            txtEl.textContent = `Clipboard text: ${text}`;
+            break;
+          }
+          if (item.types.some(t => t.startsWith('image/'))) {
+            const blob = await item.getType(item.types.find(t => t.startsWith('image/')));
+            const url = URL.createObjectURL(blob);
+            const img = document.createElement('img');
+            img.src = url;
+            imgEl.appendChild(img);
+            txtEl.textContent = '[Clipboard contains image]';
+            break;
+          }
+        }
+      } else if (navigator.clipboard.readText) {
+        const text = await navigator.clipboard.readText();
+        txtEl.textContent = `Clipboard text: ${text}`;
+      } else {
+        txtEl.textContent = 'Clipboard API not supported';
+      }
+    } catch (e) {
+      txtEl.textContent = 'Clipboard error: ' + e.message;
+    }
+  }
+
+  // Clipboard overwrite test
+  function testClipboardOverwrite() {
+    const txtEl = document.getElementById('cliptext');
+    try {
+      navigator.clipboard.writeText('WalletSecurityTest_OverwriteCheck_' + Date.now());
+      txtEl.textContent = 'Clipboard overwritten with test string. Check paste functionality.';
+    } catch (e) {
+      txtEl.textContent = 'Clipboard write error: ' + e.message;
+    }
+  }
+
+  // 3. Simulate eth_sendTransaction + Replay
+  async function simulateSendTx() {
+    const out = document.getElementById('rpclog');
+    if (!window.ethereum) {
+      out.textContent = '✖ No wallet detected';
+      return;
+    }
+    out.textContent = 'Sending simulated transaction...';
+    try {
+      await window.ethereum.request({
+        method: 'eth_sendTransaction',
+        params: [{ to: '0x000000000000000000000000000000000000dead', value: '0x0' }],
+      });
+      out.textContent += '\n✅ Transaction succeeded (or user approved silently)';
+    } catch (e) {
+      out.textContent += `\n❌ Transaction blocked or error: ${e.message}`;
+    }
+  }
+
+  async function simulateReplayTx() {
+    const out = document.getElementById('rpclog');
+    if (!window.ethereum) {
+      out.textContent = '✖ No wallet detected';
+      return;
+    }
+    out.textContent = 'Simulating transaction replay with same nonce...';
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+      if (!accounts.length) {
+        out.textContent += '\n❌ No accounts connected';
+        return;
+      }
+      // Nonce reuse simulation: reuse nonce 0 or 1 - wallet may block or warn
+      const tx = {
+        from: accounts[0],
+        to: '0x000000000000000000000000000000000000dead',
+        value: '0x0',
+        nonce: '0x0'
+      };
+      await window.ethereum.request({ method: 'eth_sendTransaction', params: [tx] });
+      await window.ethereum.request({ method: 'eth_sendTransaction', params: [tx] });
+      out.textContent += '\n✅ Replay transactions sent (wallet may allow this)';
+    } catch (e) {
+      out.textContent += `\n❌ Error or block detected: ${e.message}`;
+    }
+  }
+
+  // 4. postMessage + chrome.runtime messaging
+  function testPost() {
+    const out = document.getElementById('msglog');
+    out.textContent = '';
+    window.addEventListener('message', (e) => {
+      out.textContent += `Message received: ${JSON.stringify(e.data)}\n`;
+    });
+    window.postMessage({ test: 'hello from page' }, '*');
+
+    if (window.chrome && chrome.runtime && chrome.runtime.sendMessage) {
+      try {
+        chrome.runtime.sendMessage('abcdef', { ping: 1 }, (response) => {
+          out.textContent += 'chrome.runtime.sendMessage allowed\n';
+        });
+      } catch (e) {
+        out.textContent += 'chrome.runtime.sendMessage blocked: ' + e.message + '\n';
+      }
+    } else {
+      out.textContent += 'chrome.runtime API not available\n';
+    }
+  }
+
+  // 5. Storage inspection
+  function inspectStorage() {
+    const out = document.getElementById('storagelog');
+    out.textContent = 'localStorage:\n';
+    try {
+      for (let key in localStorage) {
+        out.textContent += `  ${key} = ${localStorage.getItem(key)}\n`;
+      }
+    } catch (e) {
+      out.textContent += 'Error reading localStorage: ' + e.message + '\n';
+    }
+    out.textContent += '\nsessionStorage:\n';
+    try {
+      for (let key in sessionStorage) {
+        out.textContent += `  ${key} = ${sessionStorage.getItem(key)}\n`;
+      }
+    } catch (e) {
+      out.textContent += 'Error reading sessionStorage: ' + e.message + '\n';
+    }
+
+    const req = indexedDB.open('walletTestDB');
+    req.onerror = () => {
+      out.textContent += '\nIndexedDB open error\n';
     };
-  </script>
+    req.onsuccess = () => {
+      out.textContent += '\nIndexedDB accessible\n';
+      req.result.close();
+    };
+  }
+
+  // 6. Deep link / URI phishing
+  function triggerDeepLink() {
+    const out = document.getElementById('phishlog');
+    const uri = 'https://walletconnect.org/?sessionId=phish-test-' + Date.now();
+    out.textContent = 'Redirecting to: ' + uri;
+    setTimeout(() => window.location.href = uri, 1000);
+  }
+
+  // 7. MutationObserver DOM injection
+  let mutationObserver;
+  function startMutationObserver() {
+    const log = document.getElementById('mutationlog');
+    if (mutationObserver) {
+      log.textContent = 'MutationObserver already running...';
+      return;
+    }
+    log.textContent = 'Starting MutationObserver...';
+    mutationObserver = new MutationObserver((mutations) => {
+      mutations.forEach(mutation => {
+        let added = Array.from(mutation.addedNodes).map(n => n.nodeName).join(',');
+        if (added) {
+          log.textContent += `\nDOM nodes added: ${added}`;
+        }
+      });
+    });
+    mutationObserver.observe(document.body, { childList: true, subtree: true });
+  }
+
+  // 8. EIP-712 Typed Data signing simulation
+  async function simulateEIP712() {
+    const out = document.getElementById('eip712log');
+    if (!window.ethereum) {
+      out.textContent = '✖ window.ethereum not detected';
+      return;
+    }
+    const msg = {
+      domain: {
+        name: "MyDApp",
+        version: "1",
+        chainId: 1,
+        verifyingContract: "0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC"
+      },
+      message: {
+        contents: "This is a test of typed data signing",
+        from: { name: "Alice", wallet: "0xabc123abc123abc123abc123abc123abc123abc1" }
+      },
+      primaryType: "Mail",
+      types: {
+        EIP712Domain: [
+          { name: "name", type: "string" },
+          { name: "version", type: "string" },
+          { name: "chainId", type: "uint256" },
+          { name: "verifyingContract", type: "address" }
+        ],
+        Mail: [
+          { name: "contents", type: "string" },
+          { name: "from", type: "Person" }
+        ],
+        Person: [
+          { name: "name", type: "string" },
+          { name: "wallet", type: "address" }
+        ]
+      }
+    };
+    try {
+      const from = (await window.ethereum.request({ method: 'eth_accounts' }))[0];
+      const params = [from, JSON.stringify(msg)];
+      const signature = await window.ethereum.request({ method: 'eth_signTypedData_v4', params });
+      out.textContent = `Signature: ${signature}`;
+    } catch (e) {
+      out.textContent = `Error or rejected: ${e.message}`;
+    }
+  }
+
+  // 9. Multiple providers detection
+  function detectMultipleProviders() {
+    const out = document.getElementById('multiprovlog');
+    let info = 'Checking multiple ethereum providers...\n';
+    if (window.ethereum && window.ethereum.providers) {
+      info += `Detected ${window.ethereum.providers.length} providers:\n`;
+      window.ethereum.providers.forEach((p, i) => {
+        info += ` Provider ${i + 1}: isMetaMask=${p.isMetaMask}, isCoinbaseWallet=${p.isCoinbaseWallet}\n`;
+      });
+    } else {
+      info += 'No multiple providers detected or property not present.';
+    }
+    out.textContent = info;
+  }
+
+  // 10. Media permissions
+  async function checkMediaPermissions() {
+    const out = document.getElementById('mediapermslog');
+    out.textContent = 'Checking media permissions...\n';
+    if (!navigator.permissions) {
+      out.textContent += 'Permissions API not supported.';
+      return;
+    }
+    try {
+      const camera = await navigator.permissions.query({ name: 'camera' });
+      const mic = await navigator.permissions.query({ name: 'microphone' });
+      out.textContent += `Camera: ${camera.state}\nMicrophone: ${mic.state}`;
+    } catch (e) {
+      out.textContent += 'Error querying permissions: ' + e.message;
+    }
+  }
+
+  // 11. CSP & XSS injection test
+  function testCSPAndXSS() {
+    const out = document.getElementById('csplog');
+    const xssOut = document.getElementById('xssoutput');
+    out.textContent = 'Testing CSP enforcement and XSS injection...\n';
+    xssOut.textContent = '';
+    // Attempt to inject script tag - should be blocked by CSP meta tag
+    try {
+      const script = document.createElement('script');
+      script.textContent = "window.xssTestRan = true; document.getElementById('xssoutput').textContent='XSS Injection SUCCESS! 🚨';";
+      document.body.appendChild(script);
+      // If script runs, xssOutput will show message.
+      setTimeout(() => {
+        if (window.xssTestRan) {
+          out.textContent += '❌ CSP failed, script injection executed!';
+        } else {
+          out.textContent += '✅ CSP enforced, script injection blocked.';
+        }
+      }, 500);
+    } catch (e) {
+      out.textContent += 'Script injection blocked or error: ' + e.message;
+    }
+  }
+
+  // 12. WebSocket insecure connection test
+  function testWebSocket() {
+    const out = document.getElementById('wslog');
+    out.textContent = 'Testing WebSocket connection to insecure endpoint...\n';
+    try {
+      // Intentionally use ws:// insecure protocol to test if blocked
+      const ws = new WebSocket('ws://echo.websocket.org');
+      ws.onopen = () => {
+        out.textContent += '✅ WebSocket connection opened.';
+        ws.close();
+      };
+      ws.onerror = (e) => {
+        out.textContent += '❌ WebSocket connection error or blocked.';
+      };
+    } catch (e) {
+      out.textContent += 'Exception: ' + e.message;
+    }
+  }
+
+  // 13. Canvas fingerprinting
+  function testCanvasFingerprint() {
+    const out = document.getElementById('canvaslog');
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = 200;
+      canvas.height = 50;
+      const ctx = canvas.getContext('2d');
+      ctx.textBaseline = 'top';
+      ctx.font = "16px 'Arial'";
+      ctx.textBaseline = "alphabetic";
+      ctx.fillStyle = "#f60";
+      ctx.fillRect(125, 1, 62, 20);
+      ctx.fillStyle = "#069";
+      ctx.fillText("Hello, wallet!", 2, 15);
+      ctx.fillStyle = "rgba(102, 204, 0, 0.7)";
+      ctx.fillText("Hello, wallet!", 4, 17);
+      const dataUrl = canvas.toDataURL();
+      out.textContent = 'Canvas fingerprint data URL:\n' + dataUrl;
+    } catch (e) {
+      out.textContent = 'Canvas fingerprinting failed: ' + e.message;
+    }
+  }
+</script>
 </body>
 </html>
