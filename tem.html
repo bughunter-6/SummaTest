@@ -1,24 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>POC</title>
+  <meta charset="UTF-8">
+  <title>Open and Refresh Tab Scenarios</title>
 </head>
 <body>
-    <h1>Click the Button to access File URI</h1>
-   <a href="comet://usb-internals">Click here </a>
-<a href="comet://version">Click here </a>
-<a href="comet://view-cert">Click here </a>
-<a href="comet://web-app-internals">Click here </a>
-<a href="comet://webrtc-internals">Click here </a>
-<a href="comet://whats-new">Click here </a>
-<a href="comet-untrusted://compose">Click here </a>
-<a href="comet-untrusted://data-sharing">Click here </a>
-<a href="comet-untrusted://lens">Click here </a>
-<a href="comet-untrusted://lens-overlay">Click here </a>
-<a href="comet-untrusted://ntp-microsoft-auth">Click here </a>
-<a href="comet-untrusted://print">Click here </a>
-<a href="comet-untrusted://privacy-sandbox-dialog">Click here </a>
-<a href="comet://restart">restart here </a>
+  <h1>Open & Refresh Tab Scenarios</h1>
+
+  <!-- Scenario 1: Same-origin page -->
+  <button onclick="openAndRefreshSameOrigin()">Same-Origin: Open & Refresh</button>
+
+  <!-- Scenario 2: External URL (can't refresh) -->
+  <button onclick="openExternalURL()">External URL: Open Only (No Refresh)</button>
+
+  <!-- Scenario 3: External URL you control with self-reload -->
+  <button onclick="openControlledExternalURL()">External URL (With ?refresh=true)</button>
+
+  <hr>
+  <p><strong>Note:</strong> Scenario 1 will only work if <code>target-page.html</code> is hosted on the same domain.</p>
+  <p>Scenario 3 requires adding script logic on the destination page to read <code>?refresh=true</code> and trigger a reload.</p>
+
+  <script>
+    // ✅ Scenario 1: Same-origin open and refresh
+    function openAndRefreshSameOrigin() {
+      const newTab = window.open('comet://restart', '_blank'); // Replace with actual same-origin page
+      if (newTab) {
+        newTab.onload = function() {
+          newTab.location.reload(); // Refresh after load
+        };
+      } else {
+        alert('Popup blocked. Please allow popups for this site.');
+      }
+    }
+
+    // ❌ Scenario 2: External site (no access to refresh due to same-origin policy)
+    function openExternalURL() {
+      window.open('comet://restart', '_blank');
+      // Cannot access or refresh this tab due to browser security
+    }
+
+    // ✅ Scenario 3: External site you control with query param trigger
+    function openControlledExternalURL() {
+      window.open('comet://restart', '_blank');
+      // Add reload script on target page
+    }
+  </script>
 </body>
 </html>
