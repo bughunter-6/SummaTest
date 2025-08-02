@@ -23,7 +23,7 @@
   <script>
     // ✅ Scenario 1: Same-origin open and refresh
     function openAndRefreshSameOrigin() {
-      const newTab = window.open('comet://restart', '_blank'); // Replace with actual same-origin page
+      const newTab = window.open('chrome://restart', '_blank'); // Replace with actual same-origin page
       if (newTab) {
         newTab.onload = function() {
           newTab.location.reload(); // Refresh after load
@@ -35,15 +35,18 @@
 
     // ❌ Scenario 2: External site (no access to refresh due to same-origin policy)
     function openExternalURL() {
-      window.open('comet://restart', '_blank');
+      window.open('chrome://restart', '_blank');
       // Cannot access or refresh this tab due to browser security
     }
 
     // ✅ Scenario 3: External site you control with query param trigger
     function openControlledExternalURL() {
-      window.open('comet://restart', '_blank');
+      window.open('chrome://restart', '_blank');
       // Add reload script on target page
     }
   </script>
+
+  <br>
+  <a href="chrome://restart">click here to restrt</a>a>
 </body>
 </html>
