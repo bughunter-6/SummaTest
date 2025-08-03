@@ -39,10 +39,10 @@
     <p>Click the button</p>
     
     <!-- Hyperlink to another page -->
-    <a href="orion://open-url?url=javascript:alert(1);" target="_blank">XSS via DeepLink</document></a>
+    <a href="orion://open-url?url=https://duckduckgo.com/?q=javascript%3Aalert(window.navigator.userAgent)&ia=web;" target="_blank">XSS via DeepLink</document></a>
 
     <br></br>
-    <a href="orion://search?q=JAVASCRIPT:ALERT(1);" target="_blank"> Simple XSS via DATA URI</document></a>
+    <a href="orion://search?q=https://duckduckgo.com/?q=javascript%3Aalert(window.navigator.userAgent)&ia=web;" target="_blank"> Simple XSS via DATA URI</document></a>
 
     
     <br><br>
