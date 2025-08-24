@@ -1,228 +1,170 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="en" target="_blank">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PoC: chrome:// URL Handling (Risk & Non-Risk)</title>
-<style>
-  :root { --bg:#0b1220; --card:#121a2b; --muted:#7f8ca3; --accent:#7aa2ff; --good:#30d158; --bad:#ff453a; --warn:#ffd60a; }
-  body { background:var(--bg); color:#e6e9ef; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; margin:0; }
-  header { padding:20px 24px; border-bottom:1px solid #223; position:sticky; top:0; background:linear-gradient(180deg, rgba(11,18,32,.95), rgba(11,18,32,.8)); backdrop-filter: blur(6px); }
-  h1 { margin:0 0 6px; font-size:20px; }
-  p { margin:6px 0; color:var(--muted); }
-  main { display:grid; grid-template-columns: 1.2fr .8fr; gap:16px; padding:16px; }
-  .panel { background:var(--card); border:1px solid #223; border-radius:14px; padding:12px; }
-  .controls { display:flex; flex-wrap:wrap; gap:12px; align-items:center; }
-  .controls label { display:flex; align-items:center; gap:8px; font-size:14px; color:var(--muted); }
-  .badge { padding:2px 8px; border-radius:999px; font-size:12px; border:1px solid #334; }
-  .risk-high { background: rgba(255,69,58,.1); color:#ffd1cf; border-color:#532; }
-  .risk-dos { background: rgba(255,214,10,.1); color:#fff2cc; border-color:#553; }
-  .risk-low { background: rgba(48,209,88,.1); color:#d4ffe2; border-color:#354; }
-  table { width:100%; border-collapse:separate; border-spacing:0 8px; }
-  th, td { text-align:left; padding:10px 8px; font-size:14px; }
-  thead th { color:#aab4c3; font-weight:600; border-bottom:1px solid #223; }
-  tr { background:#0f1728; border:1px solid #223; }
-  tr td:first-child { border-top-left-radius:10px; border-bottom-left-radius:10px; }
-  tr td:last-child { border-top-right-radius:10px; border-bottom-right-radius:10px; }
-  .row-actions { display:flex; gap:6px; flex-wrap:wrap; }
-  button { background:#16213a; color:#dbe4ff; border:1px solid #2a3557; padding:6px 10px; border-radius:10px; cursor:pointer; font-size:13px; }
-  button:hover { border-color:#3d4c7a; }
-  .btn-danger { border-color:#5a2a2a; }
-  .url { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; color:#c8d4ff; }
-  #log { height:320px; overflow:auto; background:#0a0f1c; border:1px solid #223; border-radius:10px; padding:10px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px; }
-  .log-line { margin:0 0 6px; }
-  .ok { color:var(--good); }
-  .warn { color:var(--warn); }
-  .err { color:var(--bad); }
-  iframe { width:100%; height:240px; background:#0e1424; border:1px dashed #223; border-radius:8px; }
-  .note { font-size:12px; color:#9aa5b5; }
-  footer { padding:12px 16px; color:#7f8ca3; }
-</style>
+  <meta charset="UTF-8" target="_blank">
+  <title>Chrome:// URLs PoC</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h2 { margin-top: 30px; color: #2c3e50; }
+    .danger { color: red; font-weight: bold; }
+    .disabled { color: gray; text-decoration: line-through; }
+    a { display: block; margin: 2px 0; }
+  </style>
 </head>
 <body>
-<header>
-  <h1>PoC — Handling of <code>chrome://</code> URLs</h1>
-  <p>Use this page to test how your browser handles privileged internal URLs across categories. Many attempts will be blocked (expected).
-     <strong>DoS links are disabled by default</strong> to avoid accidental crashes — enable them explicitly if needed.</p>
-  <div class="controls">
-    <label><input type="checkbox" id="enableDos"> Enable DoS/Stability test actions (may hang or crash a tab)</label>
-    <label><input type="checkbox" id="navInSameTab"> Use same-tab navigation for "Navigate" (otherwise opens a new tab)</label>
-    <span class="badge risk-high">High Risk</span>
-    <span class="badge risk-dos">DoS/Stability</span>
-    <span class="badge risk-low">Debug/Low Risk</span>
-  </div>
-</header>
+  <h1>Chrome:// URLs PoC</h1>
+  <p>⚠️ Some links may crash, restart, or hang Chrome. Use in a safe environment.</p>
 
-<main>
-  <section class="panel">
-    <h2 style="margin:0 0 10px;">Test Matrix</h2>
-    <div class="note">Actions: <strong>Open</strong> = <code>window.open(url)</code>, <strong>Navigate</strong> = change top location, <strong>iFrame</strong> = set <code>src</code> on the test frame.</div>
-    <table id="urlsTable">
-      <thead>
-        <tr>
-          <th>URL</th>
-          <th>Category</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </section>
+  <h2>✅ General & Safe Chrome Pages</h2>
+  <a href="chrome://about" target="_blank">about</a>
+  <a href="chrome://access-code-cast" target="_blank">access-code-cast</a>
+  <a href="chrome://accessibility" target="_blank">accessibility</a>
+  <a href="chrome://app-service-internals" target="_blank">app-service-internals</a>
+  <a href="chrome://app-settings" target="_blank">app-settings</a>
+  <a href="chrome://apps" target="_blank">apps</a>
+  <a href="chrome://attribution-internals" target="_blank">attribution-internals</a>
+  <a href="chrome://autofill-internals" target="_blank">autofill-internals</a>
+  <a href="chrome://batch-upload" target="_blank">batch-upload</a>
+  <a href="chrome://blob-internals" target="_blank">blob-internals</a>
+  <a href="chrome://bluetooth-internals" target="_blank">bluetooth-internals</a>
+  <a href="chrome://bookmarks" target="_blank">bookmarks</a>
+  <a href="chrome://bookmarks-side-panel.top-chrome" target="_blank">bookmarks-side-panel</a>
+  <a href="chrome://browser-switch" target="_blank">browser-switch</a>
+  <a href="chrome://cast-feedback" target="_blank">cast-feedback</a>
+  <a href="chrome://certificate-manager" target="_blank">certificate-manager</a>
+  <a href="chrome://chrome" target="_blank">chrome</a>
+  <a href="chrome://chrome-signin" target="_blank">chrome-signin</a>
+  <a href="chrome://chrome-urls" target="_blank">chrome-urls</a>
+  <a href="chrome://compare" target="_blank">compare</a>
+  <a href="chrome://components" target="_blank">components</a>
+  <a href="chrome://conflicts" target="_blank">conflicts</a>
+  <a href="chrome://connection-help" target="_blank">connection-help</a>
+  <a href="chrome://connection-monitoring-detected" target="_blank">connection-monitoring-detected</a>
+  <a href="chrome://connectors-internals" target="_blank">connectors-internals</a>
+  <a href="chrome://crashes" target="_blank">crashes</a>
+  <a href="chrome://credits" target="_blank">credits</a>
+  <a href="chrome://customize-chrome-side-panel.top-chrome" target="_blank">customize-chrome-side-panel</a>
+  <a href="chrome://device-log" target="_blank">device-log</a>
+  <a href="chrome://dino" target="_blank">dino</a>
+  <a href="chrome://downloads" target="_blank">downloads</a>
+  <a href="chrome://extensions" target="_blank">extensions</a>
+  <a href="chrome://extensions-internals" target="_blank">extensions-internals</a>
+  <a href="chrome://extensions-zero-state" target="_blank">extensions-zero-state</a>
+  <a href="chrome://feedback" target="_blank">feedback</a>
+  <a href="chrome://flags" target="_blank">flags</a>
+  <a href="chrome://gcm-internals" target="_blank">gcm-internals</a>
+  <a href="chrome://gpu" target="_blank">gpu</a>
+  <a href="chrome://histograms" target="_blank">histograms</a>
+  <a href="chrome://history" target="_blank">history</a>
+  <a href="chrome://history-clusters-side-panel.top-chrome" target="_blank">history-clusters-side-panel</a>
+  <a href="chrome://history-side-panel.top-chrome" target="_blank">history-side-panel</a>
+  <a href="chrome://history-sync-optin" target="_blank">history-sync-optin</a>
+  <a href="chrome://indexeddb-internals" target="_blank">indexeddb-internals</a>
+  <a href="chrome://inspect" target="_blank">inspect</a>
+  <a href="chrome://internals" target="_blank">internals</a>
+  <a href="chrome://intro" target="_blank">intro</a>
+  <a href="chrome://managed-user-profile-notice" target="_blank">managed-user-profile-notice</a>
+  <a href="chrome://management" target="_blank">management</a>
+  <a href="chrome://media-engagement" target="_blank">media-engagement</a>
+  <a href="chrome://media-internals" target="_blank">media-internals</a>
+  <a href="chrome://metrics-internals" target="_blank">metrics-internals</a>
+  <a href="chrome://net-export" target="_blank">net-export</a>
+  <a href="chrome://net-internals" target="_blank">net-internals</a>
+  <a href="chrome://new-tab-page" target="_blank">new-tab-page</a>
+  <a href="chrome://new-tab-page-third-party" target="_blank">new-tab-page-third-party</a>
+  <a href="chrome://newtab" target="_blank">newtab</a>
+  <a href="chrome://ntp-tiles-internals" target="_blank">ntp-tiles-internals</a>
+  <a href="chrome://omnibox-popup.top-chrome" target="_blank">omnibox-popup</a>
+  <a href="chrome://on-device-translation-internals" target="_blank">on-device-translation-internals</a>
+  <a href="chrome://password-manager" target="_blank">password-manager</a>
+  <a href="chrome://password-manager-internals" target="_blank">password-manager-internals</a>
+  <a href="chrome://policy" target="_blank">policy</a>
+  <a href="chrome://predictors" target="_blank">predictors</a>
+  <a href="chrome://print" target="_blank">print</a>
+  <a href="chrome://privacy-sandbox-internals" target="_blank">privacy-sandbox-internals</a>
+  <a href="chrome://private-aggregation-internals" target="_blank">private-aggregation-internals</a>
+  <a href="chrome://process-internals" target="_blank">process-internals</a>
+  <a href="chrome://profile-customization" target="_blank">profile-customization</a>
+  <a href="chrome://profile-internals" target="_blank">profile-internals</a>
+  <a href="chrome://profile-picker" target="_blank">profile-picker</a>
+  <a href="chrome://quota-internals" target="_blank">quota-internals</a>
+  <a href="chrome://reset-password" target="_blank">reset-password</a>
+  <a href="chrome://sandbox" target="_blank">sandbox</a>
+  <a href="chrome://search-engine-choice" target="_blank">search-engine-choice</a>
+  <a href="chrome://segmentation-internals" target="_blank">segmentation-internals</a>
+  <a href="chrome://serviceworker-internals" target="_blank">serviceworker-internals</a>
+  <a href="chrome://settings" target="_blank">settings</a>
+  <a href="chrome://signin-email-confirmation" target="_blank">signin-email-confirmation</a>
+  <a href="chrome://signin-error" target="_blank">signin-error</a>
+  <a href="chrome://signin-internals" target="_blank">signin-internals</a>
+  <a href="chrome://signout-confirmation" target="_blank">signout-confirmation</a>
+  <a href="chrome://site-engagement" target="_blank">site-engagement</a>
+  <a href="chrome://suggest-internals" target="_blank">suggest-internals</a>
+  <a href="chrome://support-tool" target="_blank">support-tool</a>
+  <a href="chrome://sync-confirmation" target="_blank">sync-confirmation</a>
+  <a href="chrome://sync-internals" target="_blank">sync-internals</a>
+  <a href="chrome://system" target="_blank">system</a>
+  <a href="chrome://terms" target="_blank">terms</a>
+  <a href="chrome://topics-internals" target="_blank">topics-internals</a>
+  <a href="chrome://translate-internals" target="_blank">translate-internals</a>
+  <a href="chrome://usb-internals" target="_blank">usb-internals</a>
+  <a href="chrome://version" target="_blank">version</a>
+  <a href="chrome://view-cert" target="_blank">view-cert</a>
+  <a href="chrome://web-app-internals" target="_blank">web-app-internals</a>
+  <a href="chrome://webrtc-internals" target="_blank">webrtc-internals</a>
+  <a href="chrome://whats-new" target="_blank">whats-new</a>
 
-  <aside class="panel">
-    <h3 style="margin:0 0 8px;">Result Log</h3>
-    <div id="log" aria-live="polite"></div>
-    <h3 style="margin:10px 0 8px;">iFrame Viewer</h3>
-    <iframe id="testFrame" title="iFrame target" sandbox=""></iframe>
-    <div class="note">The iframe is fully sandboxed. Many internal pages cannot load in iframes by design.</div>
-  </aside>
-</main>
+  <h2>🔎 Internals / Debugging Pages</h2>
+  <a href="chrome://actor-internals" target="_blank">actor-internals</a>
+  <a href="chrome://commerce-internals" target="_blank">commerce-internals</a>
+  <a href="chrome://data-sharing-internals" target="_blank">data-sharing-internals</a>
+  <a href="chrome://discards" target="_blank">discards</a>
+  <a href="chrome://download-internals" target="_blank">download-internals</a>
+  <a href="chrome://family-link-user-internals" target="_blank">family-link-user-internals</a>
+  <a href="chrome://history-clusters-internals" target="_blank">history-clusters-internals</a>
+  <a href="chrome://infobar-internals" target="_blank">infobar-internals</a>
+  <a href="chrome://interstitials" target="_blank">interstitials</a>
+  <a href="chrome://local-state" target="_blank">local-state</a>
+  <a href="chrome://location-internals" target="_blank">location-internals</a>
+  <a href="chrome://media-router-internals" target="_blank">media-router-internals</a>
+  <a href="chrome://memory-internals" target="_blank">memory-internals</a>
+  <a href="chrome://network-errors" target="_blank">network-errors</a>
+  <a href="chrome://omnibox" target="_blank">omnibox</a>
+  <a href="chrome://on-device-internals" target="_blank">on-device-internals</a>
+  <a href="chrome://optimization-guide-internals" target="_blank">optimization-guide-internals</a>
+  <a href="chrome://safe-browsing" target="_blank">safe-browsing</a>
+  <a href="chrome://traces" target="_blank">traces</a>
+  <a href="chrome://traces-internals" target="_blank">traces-internals</a>
+  <a href="chrome://tracing" target="_blank">tracing</a>
+  <a href="chrome://ukm" target="_blank">ukm</a>
+  <a href="chrome://user-actions" target="_blank">user-actions</a>
+  <a href="chrome://user-education-internals" target="_blank">user-education-internals</a>
+  <a href="chrome://webrtc-logs" target="_blank">webrtc-logs</a>
+  <a href="chrome://webui-gallery" target="_blank">webui-gallery</a>
+  <a href="chrome://webxr-internals" target="_blank">webxr-internals</a>
 
-<footer class="note">
-  Tip: Test on different platforms (Desktop, Android, iOS). Differences may indicate platform-specific policy gaps.
-</footer>
-
-<script>
-const urls = [
-  // High Risk / Sensitive
-  {url:'chrome://flags', cat:'High Risk'},
-  {url:'chrome://policy', cat:'High Risk'},
-  {url:'chrome://extensions', cat:'High Risk'},
-  {url:'chrome://settings', cat:'High Risk'},
-  {url:'chrome://sync-internals', cat:'High Risk'},
-  {url:'chrome://password-manager-internals', cat:'High Risk'},
-  {url:'chrome://system', cat:'High Risk'},
-  {url:'chrome://net-internals', cat:'High Risk'},
-  {url:'chrome://histograms', cat:'High Risk'},
-  {url:'chrome://gpu', cat:'High Risk'},
-  {url:'chrome://crashes', cat:'High Risk'},
-
-  // DoS / Stability
-  {url:'chrome://crash', cat:'DoS'},
-  {url:'chrome://kill', cat:'DoS'},
-  {url:'chrome://hang', cat:'DoS'},
-  {url:'chrome://shorthang', cat:'DoS'},
-  {url:'chrome://quit', cat:'DoS'},
-  {url:'chrome://restart', cat:'DoS'},
-
-  // Debug / Low Risk
-  {url:'chrome://version', cat:'Low Risk'},
-  {url:'chrome://downloads', cat:'Low Risk'},
-  {url:'chrome://history', cat:'Low Risk'},
-  {url:'chrome://bookmarks', cat:'Low Risk'},
-  {url:'chrome://dino', cat:'Low Risk'}
-];
-
-const log = (msg, cls='') => {
-  const el = document.createElement('div');
-  el.className = 'log-line ' + cls;
-  const time = new Date().toLocaleTimeString();
-  el.textContent = `[${time}] ${msg}`;
-  document.getElementById('log').prepend(el);
-};
-
-function addRow(entry) {
-  const tbody = document.querySelector('#urlsTable tbody');
-  const tr = document.createElement('tr');
-
-  const tdUrl = document.createElement('td');
-  tdUrl.innerHTML = `<span class="url">${entry.url}</span>`;
-  tr.appendChild(tdUrl);
-
-  const tdCat = document.createElement('td');
-  const badgeClass = entry.cat === 'High Risk' ? 'risk-high' : (entry.cat === 'DoS' ? 'risk-dos' : 'risk-low');
-  tdCat.innerHTML = `<span class="badge ${badgeClass}">${entry.cat}</span>`;
-  tr.appendChild(tdCat);
-
-  const tdActions = document.createElement('td');
-  const actions = document.createElement('div');
-  actions.className = 'row-actions';
-
-  // window.open
-  const btnOpen = document.createElement('button');
-  btnOpen.textContent = 'Open';
-  btnOpen.onclick = () => {
-    try {
-      const w = window.open(entry.url, '_blank', 'noopener,noreferrer');
-      if (w) {
-        log(`window.open attempted -> ${entry.url}`, 'ok');
-      } else {
-        log(`window.open blocked or failed -> ${entry.url}`, 'warn');
-      }
-    } catch (e) {
-      log(`window.open error for ${entry.url}: ${e}`, 'err');
-    }
-  };
-  actions.appendChild(btnOpen);
-
-  // Navigate
-  const btnNav = document.createElement('button');
-  btnNav.textContent = 'Navigate';
-  btnNav.onclick = () => {
-    try {
-      const sameTab = document.getElementById('navInSameTab').checked;
-      if (sameTab) {
-        log(`Attempting same-tab navigation -> ${entry.url}`, 'warn');
-        window.location.href = entry.url;
-      } else {
-        const a = document.createElement('a');
-        a.href = entry.url;
-        a.target = '_blank';
-        a.rel = 'noopener noreferrer';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        log(`Opened in new tab via anchor -> ${entry.url}`, 'ok');
-      }
-    } catch (e) {
-      log(`Navigation error for ${entry.url}: ${e}`, 'err');
-    }
-  };
-  actions.appendChild(btnNav);
-
-  // iFrame
-  const btnIframe = document.createElement('button');
-  btnIframe.textContent = 'iFrame';
-  btnIframe.onclick = () => {
-    try {
-      const frame = document.getElementById('testFrame');
-      frame.src = 'about:blank'; // reset
-      setTimeout(() => {
-        frame.src = entry.url;
-        log(`Set iframe src -> ${entry.url} (likely blocked)`, 'warn');
-      }, 50);
-    } catch (e) {
-      log(`iFrame set error for ${entry.url}: ${e}`, 'err');
-    }
-  };
-  actions.appendChild(btnIframe);
-
-  // Guard dangerous DoS actions
-  if (entry.cat === 'DoS') {
-    btnOpen.classList.add('btn-danger');
-    btnNav.classList.add('btn-danger');
-    btnIframe.classList.add('btn-danger');
-    const toggle = document.getElementById('enableDos');
-    const setDisabled = () => {
-      const en = toggle.checked;
-      btnOpen.disabled = !en;
-      btnNav.disabled = !en;
-      btnIframe.disabled = !en;
-    };
-    setDisabled();
-    toggle.addEventListener('change', setDisabled);
-  }
-
-  tdActions.appendChild(actions);
-  tr.appendChild(tdActions);
-  tbody.appendChild(tr);
-}
-
-urls.forEach(addRow);
-
-// Log basic environment
-log('PoC loaded. Use buttons to test handling of chrome:// URLs.');
-log('Note: Many actions will be blocked by design. Differences across platforms/browsers may indicate policy gaps.', 'warn');
-</script>
+  <h2 class="danger" target="_blank">☠️ Dangerous / Crash & Kill URLs</h2>
+  <p class="disabled" target="_blank">⚠️ These are listed only as text to avoid auto-crash. Copy & paste into Chrome manually if testing.</p>
+    <a href="chrome://badcastcrash" target="_blank">Bad</a>
+    <a href="chrome://inducebrowsercrashforrealz" target="_blank">crash</a>
+    <a href="chrome://inducebrowserdcheckforrealz" target="_blank">crash</a>
+    <a href="chrome://crash" target="_blank"></a>
+    <a href="chrome://crash/rust" target="_blank"></a>
+    <a href="chrome://crashdump" target="_blank">dump</a>
+    <a href="chrome://kill" target="_blank">kill</a>
+    <a href="chrome://hang" target="_blank"></a>
+    <a href="chrome://shorthang" target="_blank">hang</a>
+    <a href="chrome://gpuclean" target="_blank"></a>
+    <a href="chrome://gpucrash" target="_blank">gpu</a>
+    <a href="chrome://gpuhang" target="_blank"></a>
+    <a href="chrome://memory-exhaust" target="_blank"></a>
+    <a href="chrome://memory-pressure-critical" target="_blank"></a>
+    <a href="chrome://memory-pressure-moderate" target="_blank"></a>
+    <a href="chrome://inducebrowserheapcorruption" target="_blank"></a>
+    <a href="chrome://crash/cfg" target="_blank"></a>
+    <a href="chrome://heapcorruptioncrash" target="_blank"></a>
+    <a href="chrome://quit" target="_blank">quit</a>
+    <a href="chrome://restart" target="_blank">restart</a>
+  </ul>
 </body>
 </html>
