@@ -1,7 +1,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<h1 style="color:green;">Test1</h1>
+<h1 style="color:red;">UXSS</h1>
 <a href="javascript:alert('UXSS')" id="a">javascript:alert('UXSS')</a><br>
-<h1 style="color:red;">Test2</h1>
+<h1 style="color:red;">XSS - User Agent</h1>
+<a href="javascript:alert('UXSS')" id="a">javascript:alert('UXSS')</a><br>
+<h1 style="color:red;">XSS - Cookie</h1>
 <a href="javascript://%0a%0dalert('UXSS')" id="b">javascript://%0a%0dalert('UXSS')</a>
