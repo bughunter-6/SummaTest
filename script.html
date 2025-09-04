@@ -4,6 +4,6 @@
 <h1 style="color:red;">UXSS</h1>
 <a href="javascript:alert('UXSS')" id="a">javascript:alert('UXSS')</a><br>
 <h1 style="color:red;">XSS - User Agent</h1>
-<a href="javascript:alert('UXSS')" id="a">javascript:alert(window.navigator.userAgent)</a><br>
+<a href="javascript:alert(window.navigator.userAgent)" id="a">javascript:alert(window.navigator.userAgent)</a><br>
 <h1 style="color:red;">XSS - Cookie</h1>
-<a href="javascript://%0a%0dalert('UXSS')" id="b">javascript://%0a%0dalert(document.cookie)</a>
+<a href="javascript://%0a%0dalert(document.cookie)" id="b">javascript://%0a%0dalert(document.cookie)</a>
