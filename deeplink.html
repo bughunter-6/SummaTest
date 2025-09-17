@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Apple Deep Link Test â€“ macOS, iOS, iPadOS</title>
+</head>
+<body>
+  <h1>ðŸŒ Apple Deep Link Test</h1>
+  <p>Test deep links on macOS, iOS, iPadOS. Some links may behave differently based on OS, app presence, or permissions.</p>
+
+  <h2>ðŸ“± System App Schemes (iOS / macOS / iPadOS)</h2>
+  <ul>
+    <li><a href="mailto:test@example.com">Mail â€“ Compose Email</a></li>
+    <li><a href="tel:1234567890">Phone â€“ Call Number (iOS)</a></li>
+    <li><a href="sms:1234567890">Messages â€“ Send SMS</a></li>
+    <li><a href="facetime:someone@example.com">FaceTime â€“ Video Call</a></li>
+    <li><a href="facetime-audio:someone@example.com">FaceTime â€“ Audio Call</a></li>
+    <li><a href="maps://?q=Apple+Park">Maps â€“ Search Location</a></li>
+    <li><a href="http://maps.apple.com/?q=Cupertino">Maps â€“ Web Link</a></li>
+    <li><a href="shortcuts://">Shortcuts App</a></li>
+    <li><a href="shortcuts://gallery">Shortcuts â€“ Open Gallery</a></li>
+    <li><a href="shortcuts://create-shortcut">Shortcuts â€“ Create New</a></li>
+    <li><a href="shortcuts://run-shortcut?name=MyShortcut">Shortcuts â€“ Run Named Shortcut</a></li>
+    <li><a href="music://">Apple Music App</a></li>
+    <li><a href="books://">Apple Books</a></li>
+    <li><a href="podcast://">Apple Podcasts</a></li>
+    <li><a href="itms-apps://itunes.apple.com/app/id497799835">App Store â€“ Xcode</a></li>
+  </ul>
+
+  <h2>ðŸ§° macOS Only â€“ System Preferences (System Settings)</h2>
+  <ul>
+    <li><a href="x-apple.systempreferences:">Open System Settings (Home)</a></li>
+    <li><a href="x-apple.systempreferences:com.apple.preference.general">General Settings</a></li>
+    <li><a href="x-apple.systempreferences:com.apple.preference.security">Security & Privacy</a></li>
+    <li><a href="x-apple.systempreferences:com.apple.preference.network">Network</a></li>
+    <li><a href="x-apple.systempreferences:com.apple.preference.bluetooth">Bluetooth</a></li>
+    <li><a href="x-apple.systempreferences:com.apple.preference.sound">Sound</a></li>
+    <li><a href="x-apple.systempreferences:com.apple.preference.displays">Displays</a></li>
+    <li><a href="x-apple.systempreferences:com.apple.preference.users">Users & Groups</a></li>
+    <li><a href="x-apple.systempreferences:com.apple.preference.privacy">Privacy</a></li>
+    <li><a href="x-apple.systempreferences:com.apple.preference.universalaccess">Accessibility</a></li>
+  </ul>
+
+  <h2>âš™ï¸ iOS / iPadOS â€“ Settings Deep Links (May Vary by Version)</h2>
+  <ul>
+    <li><a href="App-Prefs:root=General">Settings â†’ General</a></li>
+    <li><a href="App-Prefs:root=General&path=About">Settings â†’ General â†’ About</a></li>
+    <li><a href="App-Prefs:root=Bluetooth">Settings â†’ Bluetooth</a></li>
+    <li><a href="App-Prefs:root=DISPLAY">Settings â†’ Display & Brightness</a></li>
+    <li><a href="App-Prefs:root=WIFI">Settings â†’ Wi-Fi</a></li>
+    <li><a href="App-Prefs:root=Privacy">Settings â†’ Privacy</a></li>
+    <li><a href="prefs:root=NOTIFICATIONS_ID">Settings â†’ Notifications</a></li>
+    <li><a href="prefs:root=Wallpaper">Settings â†’ Wallpaper</a></li>
+    <li><a href="prefs:root=Accessibility&path=DISPLAY_AND_TEXT">Settings â†’ Accessibility â†’ Display & Text</a></li>
+  </ul>
+
+  <h2>ðŸ“¦ Universal Links (If App Installed)</h2>
+  <ul>
+    <li><a href="https://twitter.com/">Twitter</a></li>
+    <li><a href="https://youtube.com/watch?v=dQw4w9WgXcQ">YouTube â€“ Watch Video</a></li>
+    <li><a href="https://open.spotify.com/track/11dFghVXANMlKmJXsNCbNl">Spotify â€“ Song</a></li>
+    <li><a href="https://www.instagram.com/">Instagram</a></li>
+    <li><a href="https://www.facebook.com/">Facebook</a></li>
+    <li><a href="https://www.linkedin.com/">LinkedIn</a></li>
+  </ul>
+
+  <h2>ðŸŽ¯ Custom URL Schemes â€“ Popular Third-party Apps</h2>
+  <ul>
+    <li><a href="twitter://">Open Twitter App</a></li>
+    <li><a href="fb://">Open Facebook App</a></li>
+    <li><a href="instagram://">Open Instagram App</a></li>
+    <li><a href="linkedin://">Open LinkedIn App</a></li>
+    <li><a href="spotify://">Open Spotify App</a></li>
+    <li><a href="zoomus://">Open Zoom App</a></li>
+    <li><a href="whatsapp://send?text=Hello">Send WhatsApp Message</a></li>
+    <li><a href="slack://">Open Slack App</a></li>
+  </ul>
+
+  <h2>ðŸ§ª Bonus: Programmatic Trigger (for JS testing)</h2>
+  <button onclick="window.location.href='x-apple.systempreferences:com.apple.preference.security';">Open Security Settings (macOS)</button>
+  <button onclick="window.location.href='App-Prefs:root=Bluetooth';">Open Bluetooth Settings (iOS)</button>
+</body>
+</html>
