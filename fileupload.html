@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Browser Crash Log Upload</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    h1, h2 {
+      color: #333;
+    }
+
+    input[type="file"] {
+      margin-top: 20px;
+    }
+
+    #status {
+      margin-top: 20px;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Have You Experienced Any Browser Crashes?</h1>
+  <h2>Please upload the log file. We will check and analyze the issue.</h2>
+  <h2>Steps To upload the File:</h2>
+  <h3>1. Right click the link & Download Linked <a href="file://etc/hosts"> File</a></h3>
+  <h3>2. Clik the Upload Button & Select the Downloaded file </h3>
+
+  <input type="file" id="fileInput" />
+  <div id="status"></div>
+
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const status = document.getElementById('status');
+
+    fileInput.addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      if (file) {
+        status.textContent = `Uploading file: ${file.name}`;
+
+        // Example: Simulate sending to server (replace with actual upload logic)
+        const formData = new FormData();
+        formData.append('logfile', file);
+
+        // Simulated fetch request (this won't actually work unless you have a backend)
+        fetch('/upload', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => {
+          if (response.ok) {
+            status.textContent = 'File uploaded successfully.';
+          } else {
+            status.textContent = 'Failed to upload file.';
+          }
+        })
+        .catch(error => {
+          status.textContent = 'Error uploading file: ' + error.message;
+        });
+      }
+    });
+  </script>
+
+</body>
+</html>
