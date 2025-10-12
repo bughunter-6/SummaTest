@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>POC — Copy to Clipboard</title>
+  <title>POC — Copy to Clipboard (fixed)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
     body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:24px;background:#f6f7fb;color:#111}
@@ -10,67 +10,76 @@
     button{padding:10px 14px;border-radius:8px;border:0;background:#0b84ff;color:#fff;cursor:pointer}
     pre{background:#0f1720;color:#e6eef6;padding:12px;border-radius:8px;overflow:auto}
     .warn{background:#fff3cd;border:1px solid #ffecb5;padding:10px;border-radius:8px;color:#664d03;margin-bottom:12px}
+    .small{font-size:13px;color:#6b7280}
   </style>
 </head>
 <body>
   <div class="card">
-    <h2>Overwrite Clipboard Silently</h2>
-    <p>
-      Click the button below — It will open apple.com in a new tab immediately.
-    </p>
+    <h2>Overwrite Clipboard & Open Tab (TEST ONLY)</h2>
+    <p class="small">Click the button below — it will open a new tab immediately, then attempt to write a safe test string to the clipboard, and finally navigate the new tab to apple.com if the write succeeds.</p>
 
-    <p>
-      <button id="btn">Open Apple</button>
-    </p>
+    <p><button id="btn">Open Apple</button></p>
+
+    <div style="margin-top:12px;">
+      <strong>What will be written to clipboard (safe):</strong>
+      <pre id="payload">TEST CLIPBOARD CONTENT — demo.example.com — DO NOT PASTE</pre>
+    </div>
+
+    <div style="margin-top:12px;">
+      <strong>Log</strong>
+      <pre id="log">Ready.</pre>
+    </div>
   </div>
 
 <script>
+  // DOM refs
+  const btn = document.getElementById('btn');
+  const logEl = document.getElementById('log');
+  const payloadEl = document.getElementById('payload');
 
-  function log(msg){
+  // payload text (safe test-only)
+  const payload = payloadEl.textContent.trim();
+
+  function appendLog(msg){
     const t = new Date().toISOString();
     logEl.textContent += `\n[${t}] ${msg}`;
     console.log('[POC]', msg);
   }
 
   btn.addEventListener('click', (ev) => {
-    // 1) Open the new window synchronously to avoid popup blockers
-    // Use about:blank so we can navigate later (some browsers prefer this)
+    // open new window synchronously to avoid popup blockers
     const newWin = window.open('about:blank', '_blank', 'noopener');
 
     if (!newWin) {
-      log('Popup blocked => window.open returned null. Cannot proceed reliably.');
+      appendLog('Popup blocked => window.open returned null. Cannot proceed reliably.');
       alert('Popup blocked. Allow popups for this test and try again.');
       return;
     }
-    log('New window opened synchronously (about:blank).');
+    appendLog('New window opened synchronously (about:blank).');
 
-    // 2) Attempt clipboard write (must be called under user gesture in many browsers)
-    // Note: navigator.clipboard.writeText returns a Promise
+    // clipboard API availability
     if (!navigator.clipboard || !navigator.clipboard.writeText) {
-      log('Clipboard API not available in this environment. Aborting clipboard write.');
-      // show fallback content in new window
+      appendLog('Clipboard API not available in this environment. Aborting clipboard write.');
       newWin.document.body.innerHTML = '<p>Clipboard API not available in this environment.</p>';
       return;
     }
 
-    // We do not await before opening the window (we already opened it). Now write the clipboard.
+    // attempt clipboard write
     navigator.clipboard.writeText(payload).then(() => {
-      log('Clipboard write succeeded.');
-      // navigate new window to a demonstration URL (safe)
+      appendLog('Clipboard write succeeded.');
+      // navigate the new window to a demonstration URL
       try {
         newWin.location.href = 'https://apple.com';
-        log('New window navigated to https://apple.com');
+        appendLog('New window navigated to https://apple.com');
       } catch (e) {
-        // some browsers restrict navigation on certain contexts; show fallback message
-        newWin.document.body.innerHTML = '<p>Clipboard write succeeded. Please navigate to https://example.com manually.</p>';
-        log('Navigation attempt failed; wrote a fallback message into the new window.');
+        newWin.document.body.innerHTML = '<p>Clipboard write succeeded. Please navigate to https://apple.com manually.</p>';
+        appendLog('Navigation attempt failed; wrote fallback content into the new window.');
       }
     }).catch((err) => {
-      log('Clipboard write failed: ' + err);
-      // Keep the new window open and show error to user for debugging
+      appendLog('Clipboard write failed: ' + err);
       try {
         newWin.document.body.innerHTML = '<p>Clipboard write failed: ' + String(err) + '</p>';
-      } catch(e) {}
+      } catch (e) {}
     });
   });
 </script>
