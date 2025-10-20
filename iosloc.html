@@ -1,0 +1,55 @@
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+    h1 {
+        margin: 1em;
+    }
+
+    a {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
+
+    input {
+        display: none;
+    }
+
+    #map {
+        width: 100%;
+        height: 400px;
+    }
+</style>
+
+<h1>Tap to share your location with Google</h1>
+
+<a id="link" href="https://google.com" target="_blank"></a>
+
+<div id="map"></div>
+
+<script>
+    link.onclick = () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((position) => {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+
+                const map = document.getElementById('map');
+                map.innerHTML = `<iframe 
+                    width="100%" 
+                    height="400" 
+                    frameborder="0" 
+                    style="border:0" 
+                    src="https://www.google.com/maps?q=${latitude},${longitude}&hl=es;z=14&output=embed">
+                </iframe>`;
+            }, (error) => {
+                console.error('Error accessing location:', error);
+            });
+        } else {
+            console.error('Geolocation is not supported by this browser.');
+        }
+    }
+</script>
