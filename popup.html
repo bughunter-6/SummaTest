@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Popup test</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:40px;background:#f7fafc;color:#111}
+    .card{max-width:600px;background:#fff;padding:20px;border-radius:10px;box-shadow:0 6px 18px rgba(16,24,40,0.06)}
+    button{padding:10px 14px;border-radius:8px;border:0;background:#0b84ff;color:#fff;cursor:pointer;font-size:16px}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Popup opener</h2>
+    <p>Click the button below to open <strong>Fake Google Page</strong> in a popup window. This opens synchronously during the click so popup blockers are less likely to block it.</p>
+    <p><button id="openBtn">Open popup</button></p>
+  </div>
+
+<script>
+  document.getElementById('openBtn').addEventListener('click', function () {
+    // open synchronously in the click handler to avoid popup blockers
+    const w = window.open('https://fake-google-subdomain-page-for-phishing.github.io/test/', '_blank', 'noopener,noreferrer,width=400,height=200');
+    if (!w) {
+      alert('Popup blocked.');
+    } else {
+      // optionally focus the new window
+      try { w.focus(); } catch(e) {}
+    }
+  });
+</script>
+</body>
+</html>
