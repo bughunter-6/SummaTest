@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Fake Microsoft Login</title>
+  <meta http-equiv="refresh" content="2;url=https://www.microsoft.com">
+  <script>
+    window.onload = function() {
+      setTimeout(function() {
+        window.open('data:text/html,<h1>Microsoft Login</h1><form>Username: <input>
+Password: <input type=password></form>', '_self');
+      }, 100);
+    }
+  </script>
+</head>
+<body>
+  <p>Redirecting to Microsoft...</p>
+</body>
+</html>
