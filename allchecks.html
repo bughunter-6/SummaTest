@@ -30,6 +30,8 @@ video { max-width: 360px; display:block; margin-top:10px; }
 <button onclick="visibility()">Page Visibility / Lifecycle</button>
 
 <h2>Device & Sensors</h2>
+<button onclick="webauthnRegister()">WebAuthn – Create Credential</button>
+<button onclick="webauthnAuth()">WebAuthn – Authenticate</button>
 <button onclick="geo()">Geolocation</button>
 <button onclick="camera()">Camera</button>
 <button onclick="microphone()">Microphone</button>
@@ -224,6 +226,81 @@ async function webXR(){
     navigator.xr.isSessionSupported('immersive-vr').then(vr=>navigator.xr.isSessionSupported('immersive-ar').then(ar=>alert("VR supported: "+vr+", AR supported: "+ar)));
   } else alert("WebXR not supported");
 }
+async function webauthnRegister() {
+  if (!window.PublicKeyCredential) {
+    alert("WebAuthn not supported");
+    return;
+  }
+
+  const publicKey = {
+    challenge: crypto.getRandomValues(new Uint8Array(32)),
+    rp: {
+      name: "WebAuthn Test App"
+    },
+    user: {
+      id: crypto.getRandomValues(new Uint8Array(16)),
+      name: "user@example.com",
+      displayName: "Test User"
+    },
+    pubKeyCredParams: [
+      { type: "public-key", alg: -7 },   // ES256
+      { type: "public-key", alg: -257 }  // RS256
+    ],
+    authenticatorSelection: {
+      userVerification: "preferred"
+    },
+    timeout: 60000,
+    attestation: "none"
+  };
+
+  try {
+    const cred = await navigator.credentials.create({ publicKey });
+    alert("WebAuthn credential created");
+    console.log("Credential:", cred);
+  } catch (e) {
+    alert("WebAuthn registration failed");
+    console.error(e);
+  }
+}
+async function webauthnRegister() {
+  if (!window.PublicKeyCredential) {
+    alert("WebAuthn not supported");
+    return;
+  }
+
+  const publicKey = {
+    challenge: crypto.getRandomValues(new Uint8Array(32)),
+    rp: {
+      name: "WebAuthn Test App"
+    },
+    user: {
+      id: crypto.getRandomValues(new Uint8Array(16)),
+      name: "user@example.com",
+      displayName: "Test User"
+    },
+    pubKeyCredParams: [
+      { type: "public-key", alg: -7 },   // ES256
+      { type: "public-key", alg: -257 }  // RS256
+    ],
+    authenticatorSelection: {
+      userVerification: "preferred"
+    },
+    timeout: 60000,
+    attestation: "none"
+  };
+
+  try {
+    const cred = await navigator.credentials.create({ publicKey });
+    alert("WebAuthn credential created");
+    console.log("Credential:", cred);
+  } catch (e) {
+    alert("WebAuthn registration failed");
+    console.error(e);
+  }
+}
+
+
 </script>
 </body>
 </html>
+
