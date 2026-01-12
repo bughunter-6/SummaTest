@@ -1,17 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Browser Permission Playground – Full</title>
+  <title>Browser Permission - Blank</title>
 </head>
 
 <body>
-  <button onclick="openPopup()">Open Permission Popup</button>
+  <button onclick="openPopup()">Open Permission - Blank test</button>
 
 <script>
 function openPopup() {
   const w = window.open("about:blank");
 
   const js = s => "javascript:" + encodeURIComponent(s);
+  /* ===== Rendering & Media (ADDED) ===== */
+  const dataUri = js(`
+    const i=document.createElement("iframe");
+    i.src="data:text/html,<h1>Data URI Rendered</h1>";
+    document.body.appendChild(i);
+  `);
+
+  const blobRender = js(`
+    const b=new Blob(["<h1>Blob Rendered</h1>"],{type:"text/html"});
+    window.open(URL.createObjectURL(b));
+  `);
+
+  const pip = js(`
+    const v=document.createElement("video");
+    v.src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4";
+    v.controls=true;
+    document.body.appendChild(v);
+    v.play().then(()=>v.requestPictureInPicture());
+  `);
 
   /* ===== System & UX ===== */
   const fullscreen = js(`document.documentElement.requestFullscreen()`);
@@ -148,6 +167,9 @@ function openPopup() {
     <h2>Permission Playground</h2>
 
     <h3>System & UX</h3>
+    <a href="${dataUri}">Data URI</a><br>
+    <a href="${blobRender}">Blob Render</a><br>
+    <a href="${pip}">Picture-in-Picture</a><br>
     <a href="${fullscreen}">Fullscreen</a><br>
     <a href="${wakeLock}">Wake Lock</a><br>
     <a href="${pointerLock}">Pointer Lock</a><br>
